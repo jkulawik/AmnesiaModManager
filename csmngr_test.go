@@ -1,0 +1,127 @@
+package main
+
+import (
+	"strings"
+	"testing"
+)
+
+var TestStoryMyMod = CustomStory{
+	"Tutorial",
+	"Mudbill",
+	"new_story.lang",
+	"./testdata/custom_stories/MyMod/",
+	"Error while parsing lang file XML.",
+	"customstory.png",
+}
+
+var TestStoryEscape = CustomStory{
+	"Another Madhouse mod",
+	"Sabatu",
+	"extra_english.lang",
+	"./testdata/custom_stories/_ESCAPE/",
+	"Another epic plot about people getting Amnesia",
+	"yellow.jpg",
+}
+
+func TestCheckIsRootDir(t *testing.T) {
+	// Test on bad dir
+
+	err := CheckIsRootDir(".")
+	if err == nil {
+		t.Error("Root directory isn't an Amnesia installation but one is detected")
+	}
+
+	// Test on a good dir
+	err = CheckIsRootDir("./testdata")
+
+	if err != nil {
+		t.Error(err)
+		t.Error("Root directory is an Amnesia installation but one isn't detected")
+	}
+}
+
+func TestReadCustomStoryConfig(t *testing.T) {
+
+	csxml, err := ReadCustomStoryConfig("./testdata/custom_stories/MyMod/custom_story_settings.cfg")
+	t.Log(*csxml)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if csxml.Author != "Mudbill" {
+		t.Errorf("wrong Author parameter: %s instead of Mudbill", csxml.Author)
+	}
+	if csxml.Name != "Tutorial" {
+		t.Errorf("wrong Author parameter: %s instead of Tutorial", csxml.Name)
+	}
+	if csxml.ImgFile != "customstory.png" {
+		t.Errorf("wrong Author parameter: %s instead of customstory.png", csxml.ImgFile)
+	}
+
+}
+
+func TestGetDescFromLang(t *testing.T) {
+
+	desc, err := GetDescFromLang("./testdata/custom_stories/_ESCAPE/extra_english.lang")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if desc != "Another epic plot about people getting Amnesia" {
+		t.Errorf("wrong description: %s", desc)
+	}
+}
+
+func TestGetStoryFromDir(t *testing.T) {
+	cs, err := GetStoryFromDir("./testdata/custom_stories/MyMod/")
+
+	if err != nil && !strings.Contains(err.Error(), "invalid sequence \"--\" not allowed in comments") {
+		t.Error(err)
+	}
+
+	if *cs != TestStoryMyMod {
+		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryMyMod)
+	}
+}
+
+func TestGetStoryFromDir2(t *testing.T) {
+	cs, err := GetStoryFromDir("./testdata/custom_stories/_ESCAPE/")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if *cs != TestStoryEscape {
+		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryEscape)
+	}
+}
+
+func TestGetCustomStories(t *testing.T) {
+
+	storyList, err := GetCustomStories("./testdata/custom_stories")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	MyModFound := false
+	EscapeModFound := false
+	for _, cs := range storyList {
+		t.Log(*cs)
+		if *cs != TestStoryEscape {
+			EscapeModFound = true
+		}
+		if *cs != TestStoryMyMod {
+			MyModFound = true
+		}
+	}
+
+	if !MyModFound {
+		t.Error("did not find MyMod")
+	}
+	if !EscapeModFound {
+		t.Error("did not find _ESCAPE")
+	}
+}
