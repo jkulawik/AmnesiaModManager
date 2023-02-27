@@ -30,11 +30,8 @@ func CheckIsRootDir(dir string) error {
 	if !csInDir {
 		return errors.New("custom story folder not found")
 	}
-	if !coreInDir {
-		return errors.New("core folder not found")
-	}
-	if !entInDir {
-		return errors.New("entities folder not found")
+	if !coreInDir || !entInDir {
+		return errors.New("work directory is not an Amnesia install")
 	}
 	if coreInDir && entInDir && csInDir {
 		return nil
@@ -138,6 +135,10 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	cs.author = csxml.Author
 	cs.name = csxml.Name
 	cs.imgFile = csxml.ImgFile
+
+	if _, err := os.Stat(cs.dir + cs.imgFile); err != nil {
+		cs.imgFile = ""
+	}
 
 	if csxml.ExtraLangFilePrefix != "" {
 		if csxml.DefaultExtraLangFile == "" {
