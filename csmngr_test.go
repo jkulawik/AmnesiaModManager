@@ -23,6 +23,15 @@ var TestStoryEscape = CustomStory{
 	"yellow.jpg",
 }
 
+var TestStoryBad = CustomStory{
+	"Mod with no image",
+	"Cmon",
+	"extra_english.lang",
+	"./testdata/custom_stories/BadMod/",
+	"I don't know how you can miss the damn image.",
+	"",
+}
+
 func TestCheckIsRootDir(t *testing.T) {
 	// Test on bad dir
 
@@ -95,6 +104,18 @@ func TestGetStoryFromDir2(t *testing.T) {
 
 	if *cs != TestStoryEscape {
 		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryEscape)
+	}
+}
+
+func TestGetStoryNoImg(t *testing.T) {
+	cs, err := GetStoryFromDir("./testdata/custom_stories/BadMod/")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if *cs != TestStoryBad {
+		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryBad)
 	}
 }
 
