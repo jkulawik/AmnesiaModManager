@@ -32,7 +32,7 @@ var iconBytes []byte
 var content *fyne.Container
 var selectedMod Mod
 
-const appInfo = "Amnesia Mod Manager v1.0\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+const appInfo = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
 
 func main() {
 	a := app.New()
