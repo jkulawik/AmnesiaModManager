@@ -20,6 +20,12 @@ func (cs CustomStory) listFolders() []string {
 	return []string{cs.dir}
 }
 
+type FullConversion struct {
+	name            string
+	mainInitConfig  string
+	resourcesConfig string
+}
+
 var _ Mod = (*CustomStory)(nil) // Check if CS implements interface (at compile time)
 
 // ------ HPL2 XML parsing ------ //
@@ -45,4 +51,53 @@ type LangXMLCategory struct {
 type LangXMLEntry struct {
 	Name    string `xml:"Name,attr"`
 	Content string `xml:",chardata"`
+}
+
+type MainInitXML struct {
+	ConfigFiles MainInitXMLConfigFiles `xml:"ConfigFiles"`
+	Directories MainInitXMLDirectories `xml:"Directories"`
+	Variables   MainInitXMLVariables   `xml:"Variables"`
+	StartMap    MainInitXMLStartMap    `xml:"StartMap"`
+}
+
+type MainInitXMLConfigFiles struct {
+	Resources string `xml:"Resources,attr"`
+	Materials string `xml:"Materials,attr"`
+
+	Game    string `xml:"Game,attr"`
+	Menu    string `xml:"Menu,attr"`
+	PreMenu string `xml:"PreMenu,attr"`
+	Demo    string `xml:"Demo,attr"`
+
+	DefaultMainSettings     string `xml:"DefaultMainSettings,attr"`
+	DefaultMainSettingsSDL2 string `xml:"DefaultMainSettingsSDL2,attr"`
+
+	DefaultMainSettingsLow    string `xml:"DefaultMainSettingsLow,attr"`
+	DefaultMainSettingsMedium string `xml:"DefaultMainSettingsMedium,attr"`
+	DefaultMainSettingsHigh   string `xml:"DefaultMainSettingsHigh,attr"`
+
+	DefaultUserSettings string `xml:"DefaultUserSettings,attr"`
+	DefaultUserKeys     string `xml:"DefaultUserKeys,attr"`
+	DefaultUserKeysSDL2 string `xml:"DefaultUserKeysSDL2,attr"`
+
+	DefaultBaseLanguage string `xml:"DefaultBaseLanguage,attr"`
+	DefaultGameLanguage string `xml:"DefaultGameLanguage,attr"`
+}
+
+type MainInitXMLDirectories struct {
+	MainSaveFolder     string `xml:"MainSaveFolder,attr"`
+	BaseLanguageFolder string `xml:"BaseLanguageFolder,attr"`
+	GameLanguageFolder string `xml:"GameLanguageFolder,attr"`
+	CustomStoryPath    string `xml:"CustomStoryPath,attr"`
+}
+
+type MainInitXMLVariables struct {
+	GameName      string `xml:"GameName,attr"`
+	AllowHardMode string `xml:"AllowHardMode,attr"`
+}
+
+type MainInitXMLStartMap struct {
+	File   string `xml:"File,attr"`
+	Folder string `xml:"Folder,attr"`
+	Pos    string `xml:"Pos,attr"`
 }
