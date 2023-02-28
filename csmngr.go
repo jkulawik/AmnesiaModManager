@@ -52,7 +52,12 @@ func ReadCustomStoryConfig(filepath string) (*CSXML, error) {
 	}
 
 	csxml := new(CSXML)
+	empty := new(CSXML)
 	err = xml.Unmarshal(data, csxml)
+
+	if *csxml == *empty {
+		return nil, errors.New(filepath + ": XML parser returned an empty object")
+	}
 
 	if err != nil {
 		return nil, err
