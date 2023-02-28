@@ -65,6 +65,8 @@ func ReadConversionInit(path string) (*MainInitXML, error) {
 	if err != nil {
 		return nil, err
 	}
+	// We need to wrap the config in a dummy tag to get it to unmarshal properly
+	data = []byte("<dummy>" + string(data) + "</dummy>")
 
 	mi := new(MainInitXML)
 	empty := new(MainInitXML)

@@ -14,7 +14,7 @@ func TestGetMainInitConfigs(t *testing.T) {
 	}
 }
 
-func TestGetConversionFromInit(t *testing.T) {
+func TestReadConversionInit(t *testing.T) {
 	fc, err := ReadConversionInit("testdata/SomeMod/config/main_init.cfg")
 	t.Logf("FC: %s", fc)
 
@@ -22,5 +22,10 @@ func TestGetConversionFromInit(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Error("lol get to work")
+	if fc.Variables.GameName != "A full conversion" {
+		t.Errorf("Wrong FC name: %s", fc.Variables.GameName)
+	}
+}
+
+func TestGetConversionFromInit(t *testing.T) {
 }
