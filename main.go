@@ -21,7 +21,7 @@ import (
 
 var customStories []*CustomStory
 
-const workdir = "./testdata"
+const workdir = "testdata"
 
 //go:embed default.jpg
 var defaultImgFS embed.FS
@@ -42,7 +42,7 @@ func main() {
 	err := CheckIsRootDir(workdir)
 	displayIfError(err, w)
 
-	customStories, err = GetCustomStories(workdir + "/custom_stories")
+	customStories, err = GetCustomStories(workdir + "custom_stories")
 	displayIfError(err, w)
 
 	content = container.NewMax()
@@ -160,7 +160,7 @@ func showSettings(a fyne.App) {
 
 func refreshCustomStories(w fyne.Window) {
 	var err error
-	customStories, err = GetCustomStories(workdir + "/custom_stories")
+	customStories, err = GetCustomStories(workdir + "custom_stories")
 	displayIfError(err, w)
 
 	content.Objects = []fyne.CanvasObject{makeModTypeTabs()}

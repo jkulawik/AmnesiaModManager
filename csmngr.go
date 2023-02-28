@@ -9,6 +9,10 @@ import (
 )
 
 func CheckIsRootDir(dir string) error {
+	if dir == "" {
+		dir = "."
+	}
+
 	filelist, err := os.ReadDir(dir)
 
 	if err != nil {
