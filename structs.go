@@ -28,7 +28,7 @@ type FullConversion struct {
 
 var _ Mod = (*CustomStory)(nil) // Check if CS implements interface (at compile time)
 
-// ------ HPL2 XML parsing ------ //
+// ------ Custom story config XML ------ //
 
 type CSXML struct {
 	ImgFile              string `xml:"ImgFile,attr"`
@@ -37,6 +37,8 @@ type CSXML struct {
 	ExtraLangFilePrefix  string `xml:"ExtraLangFilePrefix,attr"`
 	DefaultExtraLangFile string `xml:"DefaultExtraLangFile,attr"`
 }
+
+// ------ Lang file XML ------ //
 
 type LangXML struct {
 	XMLName    xml.Name          `xml:"LANGUAGE"`
@@ -52,6 +54,8 @@ type LangXMLEntry struct {
 	Name    string `xml:"Name,attr"`
 	Content string `xml:",chardata"`
 }
+
+// ------ FC main init XML ------ //
 
 type MainInitXML struct {
 	ConfigFiles MainInitXMLConfigFiles `xml:"ConfigFiles"`
@@ -100,4 +104,16 @@ type MainInitXMLStartMap struct {
 	File   string `xml:"File,attr"`
 	Folder string `xml:"Folder,attr"`
 	Pos    string `xml:"Pos,attr"`
+}
+
+// ------ Resources.cfg XML ------ //
+
+type ResourcesXML struct {
+	XMLName   xml.Name                `xml:"Resources"`
+	Directory []ResourcesXMLDirectory `xml:"Directory"`
+}
+
+type ResourcesXMLDirectory struct {
+	Path       string `xml:"Path,attr"`
+	AddSubDirs string `xml:"AddSubDirs,attr"`
 }

@@ -28,4 +28,19 @@ func TestReadConversionInit(t *testing.T) {
 }
 
 func TestGetConversionFromInit(t *testing.T) {
+	t.Error("unimplemented")
+}
+
+func TestGetUniqueResources(t *testing.T) {
+	res, err := GetUniqueResources("testdata/SomeMod/config/resources.cfg")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(res) != 1 || res[0] != "/SomeMod" {
+		t.Error("Parsed resource list differs from the expected one")
+		t.Log(res)
+	}
+
 }

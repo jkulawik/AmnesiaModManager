@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var originalResources = []string{
+var baseResources = []string{
 	"/_temp",
 	"/fonts",
 	"/maps",
@@ -80,5 +80,43 @@ func ReadConversionInit(path string) (*MainInitXML, error) {
 		return nil, err
 	} else {
 		return mi, nil
+	}
+}
+
+func GetUniqueResources(path string) ([]string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	res := new(ResourcesXML)
+	err = xml.Unmarshal(data, res)
+
+	if len(res.Directory) == 0 {
+		return nil, errors.New(path + ": XML parser returned an empty object")
+	}
+
+	if err != nil {
+		return nil, err
+	} else {
+		resFolders := make([]string, 0)
+		for _, entry := range res.Directory {
+			// Don't include folders of the base game
+			isInBaseResources := false
+
+			for _, baseResource := range baseResources {
+				if entry.Path == baseResource {
+					isInBaseResources = true
+					break
+				}
+			}
+
+			if !isInBaseResources {
+				resFolders = append(resFolders, entry.Path)
+			}
+
+		}
+
+		return resFolders, nil
 	}
 }
