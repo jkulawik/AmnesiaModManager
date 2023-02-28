@@ -14,6 +14,13 @@ func TestGetMainInitConfigs(t *testing.T) {
 	}
 }
 
-// func TestGetConversionFromInit(t *testing.T) {
-// 	fullConversion, err := GetConversionFromInit("./testdata/SomeMod/main_init.cfg")
-// }
+func TestGetConversionFromInit(t *testing.T) {
+	fc, err := ReadConversionInit("testdata/SomeMod/config/main_init.cfg")
+	t.Logf("FC: %s", fc)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Error("lol get to work")
+}
