@@ -21,11 +21,11 @@ import (
 )
 
 const appInfo = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+const workdir = ""
 
+var csPath string
 var customStories []*CustomStory
 var selectedMod Mod
-
-const workdir = "testdata/"
 
 //go:embed default.jpg
 var defaultImgFS embed.FS
@@ -46,6 +46,7 @@ func initLoggers() {
 }
 
 func main() {
+
 	initLoggers()
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
@@ -54,7 +55,12 @@ func main() {
 	err := CheckIsRootDir(workdir)
 	displayIfError(err, w)
 
-	customStories, err = GetCustomStories(workdir + "custom_stories")
+	if workdir == "" {
+		csPath = "custom_stories"
+	} else {
+		csPath = workdir + "/custom_stories"
+	}
+	customStories, err = GetCustomStories(csPath)
 	displayIfError(err, w)
 
 	windowContent = container.NewMax()
@@ -172,7 +178,7 @@ func showSettings(a fyne.App) {
 
 func refreshCustomStories(w fyne.Window) {
 	var err error
-	customStories, err = GetCustomStories(workdir + "custom_stories")
+	customStories, err = GetCustomStories(csPath)
 	displayIfError(err, w)
 
 	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
