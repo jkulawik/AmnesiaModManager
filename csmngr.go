@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 )
@@ -164,8 +163,13 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	cs.desc, err = GetDescFromLang(dir + cs.langFile)
 
 	if err != nil {
-		fmt.Println(cs, err)
-		return cs, err
+		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" {
+			WarningLogger.Println(cs.dir, err)
+			return cs, nil
+		} else {
+			ErrorLogger.Println(cs.dir, err)
+			return cs, err
+		}
 	}
 
 	return cs, nil
@@ -187,7 +191,7 @@ func GetCustomStories(dir string) ([]*CustomStory, error) {
 				csList = append(csList, cs)
 			}
 			if err != nil {
-				fmt.Println(err)
+				ErrorLogger.Println(err)
 				//Can't return nil dueo to an error because finding one doesn't mean the entire list is invalid
 			}
 		}

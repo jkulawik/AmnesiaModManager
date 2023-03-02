@@ -32,6 +32,10 @@ var TestStoryBad = CustomStory{
 	"",
 }
 
+func init() {
+	initLoggers()
+}
+
 func TestCheckIsRootDir(t *testing.T) {
 	// Test on bad dir
 
@@ -51,7 +55,7 @@ func TestCheckIsRootDir(t *testing.T) {
 
 func TestReadCustomStoryConfig(t *testing.T) {
 
-	csxml, err := ReadCustomStoryConfig("./testdata/custom_stories/MyMod/custom_story_settings.cfg")
+	csxml, err := ReadCustomStoryConfig("testdata/custom_stories/MyMod/custom_story_settings.cfg")
 	t.Log(*csxml)
 
 	if err != nil {

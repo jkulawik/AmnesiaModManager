@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"errors"
+	"log"
 	"os"
 
 	"fmt"
@@ -19,9 +20,12 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-var customStories []*CustomStory
+const appInfo = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
 
-const workdir = "testdata"
+var customStories []*CustomStory
+var selectedMod Mod
+
+const workdir = "testdata/"
 
 //go:embed default.jpg
 var defaultImgFS embed.FS
@@ -29,12 +33,20 @@ var defaultImgFS embed.FS
 //go:embed icon.png
 var iconBytes []byte
 
-var content *fyne.Container
-var selectedMod Mod
+var windowContent *fyne.Container
 
-const appInfo = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+var (
+	WarningLogger *log.Logger
+	ErrorLogger   *log.Logger
+)
+
+func initLoggers() {
+	WarningLogger = log.New(os.Stderr, "WARNING: ", log.Lshortfile)
+	ErrorLogger = log.New(os.Stderr, "ERROR: ", log.Lshortfile)
+}
 
 func main() {
+	initLoggers()
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
 	w := a.NewWindow("Amnesia Mod Manager")
@@ -45,14 +57,14 @@ func main() {
 	customStories, err = GetCustomStories(workdir + "custom_stories")
 	displayIfError(err, w)
 
-	content = container.NewMax()
+	windowContent = container.NewMax()
 	toolbar := makeToolbar(w, a)
-	content.Objects = []fyne.CanvasObject{makeModTypeTabs()}
-	content.Refresh()
+	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
+	windowContent.Refresh()
 
 	mainView := container.NewBorder(
 		container.NewVBox(toolbar, widget.NewSeparator()),
-		nil, nil, nil, content)
+		nil, nil, nil, windowContent)
 
 	w.SetContent(mainView)
 
@@ -62,7 +74,7 @@ func main() {
 
 func displayIfError(err error, w fyne.Window) {
 	if err != nil {
-		fmt.Println("Error: ", err)
+		ErrorLogger.Println(err)
 		dialog.ShowError(err, w)
 	}
 }
@@ -163,8 +175,8 @@ func refreshCustomStories(w fyne.Window) {
 	customStories, err = GetCustomStories(workdir + "custom_stories")
 	displayIfError(err, w)
 
-	content.Objects = []fyne.CanvasObject{makeModTypeTabs()}
-	content.Refresh()
+	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
+	windowContent.Refresh()
 }
 
 func deleteSelectedMod(w fyne.Window) {
@@ -192,7 +204,7 @@ func confirmDeleteCallback(response bool) {
 		for _, f := range selectedMod.listFolders() {
 			err := os.RemoveAll(f)
 			if err != nil {
-				fmt.Println(err)
+				ErrorLogger.Println(err)
 			}
 
 			// TODO Refresh

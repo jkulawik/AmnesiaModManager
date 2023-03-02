@@ -3,9 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"io/fs"
-	"log"
 	"os"
 )
 
@@ -47,8 +45,7 @@ func GetMainInitConfigs(workdir string) ([]string, error) {
 		}
 
 		if err != nil {
-			log.Fatal(err)
-			fmt.Println(err, "in", path)
+			ErrorLogger.Println(err, "in", path)
 		}
 		return nil
 	})
