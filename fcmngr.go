@@ -191,6 +191,10 @@ func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 		return nil, err
 	}
 
+	if workdir == "" {
+		workdir = "."
+	}
+
 	fc := new(FullConversion)
 	fc.name = init.Variables.GameName
 	fc.mainInitConfig = path
@@ -212,11 +216,26 @@ func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 func GetFullConversions(workdir string) ([]*FullConversion, error) {
 
 	initList, err := GetMainInitConfigs(workdir)
-	InfoLogger.Println("Found main init configs:", initList)
 
 	if err != nil {
 		return nil, err
 	}
+
+	// Find and remove base game init
+	var base_init string
+	if workdir == "" {
+		base_init = "config/main_init.cfg"
+	} else {
+		base_init = workdir + "/config/main_init.cfg"
+	}
+
+	for i, init := range initList {
+		if init == base_init {
+			initList = append(initList[:i], initList[i+1:]...)
+			break
+		}
+	}
+	InfoLogger.Println("Found main init configs:", initList)
 
 	fcList := make([]*FullConversion, 0, len(initList))
 
