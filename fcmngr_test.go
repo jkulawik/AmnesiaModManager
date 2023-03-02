@@ -36,20 +36,22 @@ func TestGetUniqueResources(t *testing.T) {
 
 }
 
-func TestReadMenuConfig(t *testing.T) {
-	menu, err := ReadMenuConfig("testdata/wn_config/menu.cfg")
-	t.Logf("Menu config: %s", menu)
+func TestGetLogoFromMenuConfig(t *testing.T) {
+	logo, err := GetLogoFromMenuConfig("testdata/wn_config/menu.cfg")
+	t.Logf("Menu config: %s", logo)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if menu != nil && menu.MenuLogo != "wn_menu_logo.png" {
-		t.Errorf("Wrong FC name: %s", menu.MenuLogo)
+	if logo != "wn_menu_logo.png" {
+		t.Errorf("Wrong FC logo: %s", logo)
 	}
 }
 
 func TestGetLogoFromConfig(t *testing.T) {
+	// menu, err := ReadMenuConfig("testdata/wn_config/menu.cfg")
+
 	t.Error("unimplemented")
 }
 

@@ -118,10 +118,10 @@ func GetUniqueResources(path string) ([]string, error) {
 	}
 }
 
-func ReadMenuConfig(path string) (*MenuXMLMain, error) {
+func GetLogoFromMenuConfig(path string) (string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	// We need to wrap the config in a dummy tag to get it to unmarshal properly
@@ -132,12 +132,12 @@ func ReadMenuConfig(path string) (*MenuXMLMain, error) {
 	err = xml.Unmarshal(data, menu)
 
 	if *menu == *empty {
-		return nil, errors.New(path + ": XML parser returned an empty object")
+		return "", errors.New(path + ": XML parser returned an empty object")
 	}
 
 	if err != nil {
-		return nil, err
+		return "", err
 	} else {
-		return &menu.Main, nil
+		return menu.Main.MenuLogo, nil
 	}
 }
