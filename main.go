@@ -257,8 +257,8 @@ func makeFullConversionListTab() fyne.CanvasObject {
 
 	hbox := container.NewHBox(card)
 
-	// convViewContainer := container.New(layout.NewMaxLayout(), defaultImg, card)
-	convViewContainer := container.New(layout.NewMaxLayout(), defaultImg, hbox)
+	// fcViewContainer := container.New(layout.NewMaxLayout(), defaultImg, card)
+	fcViewContainer := container.New(layout.NewMaxLayout(), defaultImg, hbox)
 
 	list := widget.NewList(
 		func() int {
@@ -298,7 +298,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		cardContentLabel.SetText("")
 	}
 	// listTab := container.NewHSplit(list, container.New(layout.NewVBoxLayout(), card))
-	listTab := container.NewHSplit(list, convViewContainer)
+	listTab := container.NewHSplit(list, fcViewContainer)
 	listTab.SetOffset(0.3)
 	return listTab
 }
