@@ -22,7 +22,7 @@ import (
 
 const (
 	appInfo     = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
-	mainWorkdir = "testdata"
+	mainWorkdir = ""
 )
 
 var (
@@ -255,7 +255,11 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	var defaultImg = canvas.NewImageFromImage(img)
 	card.Image = nil
 
-	hbox := container.NewHBox(card)
+	launchButton := widget.NewButton("Launch", launchFullConversion)
+	launchButton.Hide()
+
+	vbox := container.NewVBox(card, launchButton)
+	hbox := container.NewHBox(vbox)
 
 	// fcViewContainer := container.New(layout.NewMaxLayout(), defaultImg, card)
 	fcViewContainer := container.New(layout.NewMaxLayout(), defaultImg, hbox)
@@ -278,6 +282,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
 		folderString := formatStringList(data[id].uniqueResources)
 		cardContentLabel.SetText("Mod folder(s):\n" + folderString)
+		launchButton.Show()
 
 		if data[id].logo == "" {
 			card.SetImage(nil)
@@ -296,6 +301,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		card.SetTitle(defaultTitle)
 		card.SetSubTitle("")
 		cardContentLabel.SetText("")
+		launchButton.Hide()
 	}
 	// listTab := container.NewHSplit(list, container.New(layout.NewVBoxLayout(), card))
 	listTab := container.NewHSplit(list, fcViewContainer)
@@ -309,4 +315,8 @@ func getStringSpacer(width int) string {
 		spacer += " "
 	}
 	return spacer
+}
+
+func launchFullConversion() {
+	InfoLogger.Println("Launch button pressed")
 }
