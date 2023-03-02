@@ -91,15 +91,21 @@ func displayIfError(err error, w fyne.Window) {
 
 func makeModTypeTabs() fyne.CanvasObject {
 
-	content := container.NewMax()
-	content.Objects = []fyne.CanvasObject{makeCustomStoryListTab()}
-	content.Refresh()
+	csTabContent := container.NewMax()
+	csTabContent.Objects = []fyne.CanvasObject{makeCustomStoryListTab()}
+	csTabContent.Refresh()
+
+	fcTabContent := container.NewMax()
+	fcTabContent.Objects = []fyne.CanvasObject{makeFullConversionListTab()}
+	fcTabContent.Refresh()
 
 	return container.NewAppTabs(
-		container.NewTabItem("Custom Stories", content),
-		container.NewTabItem("Full Conversions", widget.NewLabel("Coming soon (maybe)")),
+		container.NewTabItem("Custom Stories", csTabContent),
+		container.NewTabItem("Full Conversions", fcTabContent),
 	)
 }
+
+// ----------------------- Custom Stories ----------------------- //
 
 func makeCustomStoryListTab() fyne.CanvasObject {
 	var data = customStories
@@ -160,6 +166,8 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 func makeStoryText(cs *CustomStory) string {
 	return fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.dir, cs.desc)
 }
+
+// ----------------------- General ----------------------- //
 
 func makeToolbar(window fyne.Window, app fyne.App) fyne.CanvasObject {
 	t := widget.NewToolbar(
@@ -227,7 +235,7 @@ func confirmDeleteCallback(response bool) {
 // ----------------------- FC tab ----------------------- //
 
 func makeFullConversionListTab() fyne.CanvasObject {
-	var data = customStories
+	var data = fullConversions
 
 	cardContentLabel := widget.NewLabel("")
 	cardContentLabel.Wrapping = fyne.TextWrapWord
@@ -238,17 +246,16 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	defaultImgRaw, _ := defaultImgFS.Open("default.jpg")
 	img, _ := jpeg.Decode(defaultImgRaw)
 	var defaultImg = canvas.NewImageFromImage(img)
-	//card.Image = defaultImg
-	displayImg := defaultImg
+	card.Image = nil
 
-	storyViewContainer := container.New(layout.NewMaxLayout(), displayImg, card)
+	convViewContainer := container.New(layout.NewMaxLayout(), defaultImg, card)
 
 	list := widget.NewList(
 		func() int {
 			return len(data)
 		},
 		func() fyne.CanvasObject {
-			return container.New(layout.NewHBoxLayout(), widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
+			return container.New(layout.NewHBoxLayout(), widget.NewIcon(theme.FileApplicationIcon()), widget.NewLabel("Template Object"))
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
 			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id].name)
@@ -257,18 +264,17 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	list.OnSelected = func(id widget.ListItemID) {
 		selectedMod = data[id]
 		card.SetTitle(data[id].name)
-		card.SetSubTitle("Author: " + data[id].author)
-		cardContentLabel.SetText(makeStoryText(data[id]))
+		// card.SetSubTitle("Author: " + data[id].author)
+		// cardContentLabel.SetText(makeStoryText(data[id]))
 
-		if data[id].imgFile == "" {
-			// card.SetImage(defaultImg)
-			displayImg = defaultImg
-		} else {
-			imgFile := data[id].dir + data[id].imgFile
-			displayImg = canvas.NewImageFromFile(imgFile)
-			// card.SetImage(displayImg)
+		if data[id].logo == "" {
+			card.SetImage(nil)
 		}
-		storyViewContainer.Objects[0] = displayImg
+		// else {
+		// 	imgFile := data[id].dir + data[id].logo
+		// 	displayImg := canvas.NewImageFromFile(imgFile)
+		// 	card.SetImage(displayImg)
+		// }
 	}
 	list.OnUnselected = func(id widget.ListItemID) {
 		selectedMod = nil
@@ -277,7 +283,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		cardContentLabel.SetText("")
 	}
 	// listTab := container.NewHSplit(list, container.New(layout.NewVBoxLayout(), card))
-	listTab := container.NewHSplit(list, storyViewContainer)
+	listTab := container.NewHSplit(list, convViewContainer)
 	listTab.SetOffset(0.3)
 	return listTab
 }
