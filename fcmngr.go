@@ -148,21 +148,25 @@ func GetLogoFromMenuConfig(path string) (string, error) {
 	}
 }
 
-func GetConversionFromInit(path string) (*FullConversion, error) {
+func GetConversionFromInit(path, workdir string) (*FullConversion, error) {
 	init, err := ReadConversionInit(path)
 	if err != nil {
 		return nil, err
 	}
 
+	if workdir != "" {
+		workdir += "/"
+	}
+
 	fc := new(FullConversion)
 	fc.name = init.Variables.GameName
 	fc.mainInitConfig = path
-	res, err := GetUniqueResources("testdata/" + init.ConfigFiles.Resources)
+	res, err := GetUniqueResources(workdir + init.ConfigFiles.Resources)
 	if err != nil {
 		return nil, err
 	}
 	fc.uniqueResources = res
-	logo, err := GetLogoFromMenuConfig("testdata/" + init.ConfigFiles.Menu)
+	logo, err := GetLogoFromMenuConfig(workdir + init.ConfigFiles.Menu)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +186,7 @@ func GetFullConversions(workdir string) ([]*FullConversion, error) {
 	fcList := make([]*FullConversion, 0, len(initList))
 
 	for _, init := range initList {
-		fc, err := GetConversionFromInit(init)
+		fc, err := GetConversionFromInit(init, workdir)
 
 		if err != nil {
 			return nil, err
