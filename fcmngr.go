@@ -178,7 +178,6 @@ func GetFullConversions(workdir string) ([]*FullConversion, error) {
 	if err != nil {
 		return nil, err
 	}
-	t.Log(initList)
 
 	fcList := make([]*FullConversion, 0, len(initList))
 
