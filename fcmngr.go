@@ -191,19 +191,16 @@ func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 		return nil, err
 	}
 
-	if workdir != "" {
-		workdir += "/"
-	}
-
 	fc := new(FullConversion)
 	fc.name = init.Variables.GameName
 	fc.mainInitConfig = path
-	res, err := GetUniqueResources(workdir + init.ConfigFiles.Resources)
+	res, err := GetUniqueResources(workdir + "/" + init.ConfigFiles.Resources)
 	if err != nil {
 		return nil, err
 	}
 	fc.uniqueResources = res
-	logo, err := GetLogoFromMenuConfig(workdir+init.ConfigFiles.Menu, res, workdir)
+	menuPath := workdir + "/" + init.ConfigFiles.Menu
+	logo, err := GetLogoFromMenuConfig(menuPath, res, workdir)
 	if err != nil {
 		return nil, err
 	}
