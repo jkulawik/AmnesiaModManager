@@ -9,8 +9,8 @@ func TestGetMainInitConfigs(t *testing.T) {
 		t.Error(err)
 	}
 
-	if mainInits[0] != "testdata/SomeMod/config/main_init.cfg" {
-		t.Errorf("Did not find SomeMod main init. Instead got %s", mainInits[0])
+	if mainInits[0] != "testdata/SomeMod/config/main_init.cfg" && mainInits[1] != "testdata/wn_config/main_init.cfg" {
+		t.Errorf("Did not find one of the main inits. Got: %s", mainInits)
 	}
 }
 
@@ -27,10 +27,6 @@ func TestReadConversionInit(t *testing.T) {
 	}
 }
 
-func TestGetConversionFromInit(t *testing.T) {
-	t.Error("unimplemented")
-}
-
 func TestGetUniqueResources(t *testing.T) {
 	res, err := GetUniqueResources("testdata/SomeMod/config/resources.cfg")
 
@@ -43,4 +39,25 @@ func TestGetUniqueResources(t *testing.T) {
 		t.Log(res)
 	}
 
+}
+
+func TestReadMenuConfig(t *testing.T) {
+	menu, err := ReadMenuConfig("testdata/wn_config/menu.cfg")
+	t.Logf("Menu config: %s", menu)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if menu != nil && menu.MenuLogo != "wn_menu_logo.png" {
+		t.Errorf("Wrong FC name: %s", menu.MenuLogo)
+	}
+}
+
+func TestGetLogoFromConfig(t *testing.T) {
+	t.Error("unimplemented")
+}
+
+func TestGetConversionFromInit(t *testing.T) {
+	t.Error("unimplemented")
 }

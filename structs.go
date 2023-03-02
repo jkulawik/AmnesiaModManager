@@ -24,6 +24,7 @@ type FullConversion struct {
 	name            string
 	mainInitConfig  string
 	resourcesConfig string
+	logo            string
 }
 
 var _ Mod = (*CustomStory)(nil) // Check if CS implements interface (at compile time)
@@ -56,6 +57,8 @@ type LangXMLEntry struct {
 }
 
 // ------ FC main init XML ------ //
+
+// Improve: A lot of this data isn't really needed and could be removed if the unmarshaller still works afterwards
 
 type MainInitXML struct {
 	ConfigFiles MainInitXMLConfigFiles `xml:"ConfigFiles"`
@@ -116,4 +119,35 @@ type ResourcesXML struct {
 type ResourcesXMLDirectory struct {
 	Path       string `xml:"Path,attr"`
 	AddSubDirs string `xml:"AddSubDirs,attr"`
+}
+
+// ------ Menu.cfg XML ------ //
+
+type MenuXML struct {
+	Main MenuXMLMain `xml:"Main"`
+}
+
+type MenuXMLMain struct {
+	MainFadeInTime      string `xml:"MainFadeInTime,attr"`
+	MainFadeOutTimeFast string `xml:"MainFadeOutTimeFast,attr"`
+	MainFadeOutTimeSlow string `xml:"MainFadeOutTimeSlow,attr"`
+
+	TopMenuFadeInTime             string `xml:"TopMenuFadeInTime,attr"`
+	TopMenuFadeOutTime            string `xml:"TopMenuFadeOutTime,attr"`
+	TopMenuFontRelativeSize       string `xml:"TopMenuFontRelativeSize,attr"`
+	TopMenuStartRelativePos       string `xml:"TopMenuStartRelativePos,attr"`
+	TopMenuStartRelativePosInGame string `xml:"TopMenuStartRelativePosInGame,attr"`
+	TopMenuFont                   string `xml:"TopMenuFont,attr"`
+
+	MainMenuLogoStartRelativePos string `xml:"MainMenuLogoStartRelativePos,attr"`
+	MainMenuLogoRelativeSize     string `xml:"MainMenuLogoRelativeSize,attr"`
+
+	BGScene            string `xml:"BGScene,attr"`
+	BGCamera_FOV       string `xml:"BGCamera_FOV,attr"`
+	BGCamera_ZoomedFOV string `xml:"BGCamera_ZoomedFOV,attr"`
+
+	ZoomSound string `xml:"ZoomSound,attr"`
+	Music     string `xml:"Music,attr"`
+
+	MenuLogo string `xml:"MenuLogo,attr"`
 }
