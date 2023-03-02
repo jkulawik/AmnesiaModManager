@@ -271,12 +271,11 @@ func makeFullConversionListTab() fyne.CanvasObject {
 
 		if data[id].logo == "" {
 			card.SetImage(nil)
+		} else {
+			displayImg := canvas.NewImageFromFile(data[id].logo)
+			displayImg.FillMode = canvas.ImageFillContain
+			card.SetImage(displayImg)
 		}
-		// else {
-		// 	imgFile := data[id].dir + data[id].logo
-		// 	displayImg := canvas.NewImageFromFile(imgFile)
-		// 	card.SetImage(displayImg)
-		// }
 	}
 	list.OnUnselected = func(id widget.ListItemID) {
 		selectedMod = nil
