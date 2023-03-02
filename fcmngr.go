@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/fs"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -122,7 +123,12 @@ func GetUniqueResources(path string) ([]string, error) {
 func GetLogoFromMenuConfig(path string) (string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return "", err
+		if strings.Contains(err.Error(), "no such file or directory") {
+			WarningLogger.Println(path, ": specified menu.cfg file doesn't exist")
+			return "", nil
+		} else {
+			return "", err
+		}
 	}
 
 	// We need to wrap the config in a dummy tag to get it to unmarshal properly
