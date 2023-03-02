@@ -43,6 +43,7 @@ func GetMainInitConfigs(workdir string) ([]string, error) {
 	fs.WalkDir(fileSystem, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			ErrorLogger.Println(err, "in", path)
+			return err
 		}
 		if !d.IsDir() && d.Name() == mainInitStr {
 			mainInits = append(mainInits, path)
@@ -118,7 +119,7 @@ func GetUniqueResources(path string) ([]string, error) {
 	}
 }
 
-func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) {
+func GetLogoFromMenuConfig(filepath string, resources []string, workdir string) (string, error) {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 		if strings.Contains(err.Error(), "no such file or directory") {
@@ -149,7 +150,8 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 
 	walkFunc := func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			ErrorLogger.Println(err, "in", path)
+			ErrorLogger.Println(err)
+			return err
 		}
 		if !d.IsDir() && d.Name() == menu.Main.MenuLogo {
 			alreadyFound := false
@@ -169,7 +171,7 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 	// Search custom resource dirs first
 	// (same name as vanilla logo could have been used, so we can't just search from root once)
 	for _, res := range resources {
-		fs.WalkDir(fileSystem, mainWorkdir+res, walkFunc)
+		fs.WalkDir(fileSystem, workdir+res, walkFunc)
 	}
 
 	// Search base game folders as a last ditch resort; this will search some dirs again so walkFunc checks for doubles
@@ -201,7 +203,7 @@ func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 		return nil, err
 	}
 	fc.uniqueResources = res
-	logo, err := GetLogoFromMenuConfig(workdir+init.ConfigFiles.Menu, res)
+	logo, err := GetLogoFromMenuConfig(workdir+init.ConfigFiles.Menu, res, workdir)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +227,7 @@ func GetFullConversions(workdir string) ([]*FullConversion, error) {
 		fc, err := GetConversionFromInit(workdir, init)
 
 		if err != nil {
-			return nil, err
+			ErrorLogger.Println("Error while reading full conversion from", init, "-", err)
 		}
 
 		fcList = append(fcList, fc)

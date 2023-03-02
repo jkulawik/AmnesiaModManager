@@ -40,7 +40,7 @@ func TestGetUniqueResources(t *testing.T) {
 }
 
 func TestGetLogoFromMenuConfig(t *testing.T) {
-	logo, err := GetLogoFromMenuConfig("testdata/wn_config/menu.cfg", TestWhiteNight.uniqueResources)
+	logo, err := GetLogoFromMenuConfig("testdata/wn_config/menu.cfg", TestWhiteNight.uniqueResources, "testdata")
 	t.Logf("Logo path: %s", logo)
 
 	if err != nil {
