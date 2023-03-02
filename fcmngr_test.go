@@ -54,21 +54,10 @@ func TestGetLogoFromMenuConfig(t *testing.T) {
 
 func TestGetConversionFromInit(t *testing.T) {
 	path := "testdata/wn_config/main_init.cfg"
-	init, _ := ReadConversionInit(path)
-
-	fc := new(FullConversion)
-	fc.name = init.Variables.GameName
-	fc.mainInitConfig = path
-	res, err := GetUniqueResources("testdata/" + init.ConfigFiles.Resources)
+	fc, err := GetConversionFromInit(path)
 	if err != nil {
-		t.Log(err)
+		t.Error(err)
 	}
-	fc.uniqueResources = res
-	logo, err := GetLogoFromMenuConfig("testdata/" + init.ConfigFiles.Menu)
-	if err != nil {
-		t.Log(err)
-	}
-	fc.logo = logo
 
 	// Structs with arrays aren't comparable, easiest solution is to cast them to string
 	fcString := fmt.Sprintf("%v", *fc)
@@ -86,11 +75,19 @@ func TestGetMainInitConfigs(t *testing.T) {
 		t.Error(err)
 	}
 
-	if mainInits[0] != "testdata/SomeMod/config/main_init.cfg" && mainInits[1] != "testdata/wn_config/main_init.cfg" {
+	if len(mainInits) < 2 {
+		t.Errorf("Did not find one of the main inits. Got: %s", mainInits)
+	} else if mainInits[0] != "testdata/SomeMod/config/main_init.cfg" && mainInits[1] != "testdata/wn_config/main_init.cfg" {
 		t.Errorf("Did not find one of the main inits. Got: %s", mainInits)
 	}
 }
 
-func TestGetConversions(t *testing.T) {
+func TestGetFullConversions(t *testing.T) {
+	_, err := GetFullConversions("testdata", t)
+
+	if err != nil {
+		t.Error(err)
+	}
+
 	t.Error("unimplemented")
 }

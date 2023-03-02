@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/fs"
 	"os"
+	"testing"
 )
 
 var baseResources = []string{
@@ -140,4 +141,55 @@ func GetLogoFromMenuConfig(path string) (string, error) {
 	} else {
 		return menu.Main.MenuLogo, nil
 	}
+}
+
+func GetConversionFromInit(path string) (*FullConversion, error) {
+	init, err := ReadConversionInit(path)
+	if err != nil {
+		return nil, err
+	}
+
+	fc := new(FullConversion)
+	fc.name = init.Variables.GameName
+	fc.mainInitConfig = path
+	res, err := GetUniqueResources("testdata/" + init.ConfigFiles.Resources)
+	if err != nil {
+		return nil, err
+	}
+	fc.uniqueResources = res
+	logo, err := GetLogoFromMenuConfig("testdata/" + init.ConfigFiles.Menu)
+	if err != nil {
+		return nil, err
+	}
+	fc.logo = logo
+
+	return fc, nil
+}
+
+func GetFullConversions(workdir string, t *testing.T) ([]*FullConversion, error) {
+
+	initList, err := GetMainInitConfigs(workdir)
+
+	if err != nil {
+		return nil, err
+	}
+	t.Log(initList)
+
+	fcList := make([]*FullConversion, 0, len(initList))
+
+	for _, init := range initList {
+		fc, err := GetConversionFromInit(init)
+
+		if err != nil {
+			return nil, err
+		}
+
+		fcList = append(fcList, fc)
+	}
+
+	if len(fcList) == 0 {
+		return nil, errors.New("did not find any full conversions")
+	}
+
+	return nil, nil
 }
