@@ -2,16 +2,11 @@ package main
 
 import "testing"
 
-func TestGetMainInitConfigs(t *testing.T) {
-	mainInits, err := GetMainInitConfigs("testdata")
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	if mainInits[0] != "testdata/SomeMod/config/main_init.cfg" && mainInits[1] != "testdata/wn_config/main_init.cfg" {
-		t.Errorf("Did not find one of the main inits. Got: %s", mainInits)
-	}
+var TestWhiteNight = FullConversion{
+	name:            "White Night",
+	mainInitConfig:  "",
+	resourcesConfig: "",
+	logo:            "wn_menu_logo.png",
 }
 
 func TestReadConversionInit(t *testing.T) {
@@ -59,5 +54,21 @@ func TestGetLogoFromConfig(t *testing.T) {
 }
 
 func TestGetConversionFromInit(t *testing.T) {
+	t.Error("unimplemented")
+}
+
+func TestGetMainInitConfigs(t *testing.T) {
+	mainInits, err := GetMainInitConfigs("testdata")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if mainInits[0] != "testdata/SomeMod/config/main_init.cfg" && mainInits[1] != "testdata/wn_config/main_init.cfg" {
+		t.Errorf("Did not find one of the main inits. Got: %s", mainInits)
+	}
+}
+
+func TestGetConversions(t *testing.T) {
 	t.Error("unimplemented")
 }
