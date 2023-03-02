@@ -23,8 +23,8 @@ func (cs CustomStory) listFolders() []string {
 type FullConversion struct {
 	name            string
 	mainInitConfig  string
-	resourcesConfig string
 	logo            string
+	uniqueResources []string
 }
 
 var _ Mod = (*CustomStory)(nil) // Check if CS implements interface (at compile time)

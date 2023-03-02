@@ -1,12 +1,15 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 var TestWhiteNight = FullConversion{
 	name:            "White Night",
-	mainInitConfig:  "",
-	resourcesConfig: "",
+	mainInitConfig:  "testdata/wn_config/main_init.cfg",
 	logo:            "wn_menu_logo.png",
+	uniqueResources: []string{"/wn_models", "/wn_sounds", "/wn_graphics", "/wn_models", "/wn_music"},
 }
 
 func TestReadConversionInit(t *testing.T) {
@@ -49,14 +52,31 @@ func TestGetLogoFromMenuConfig(t *testing.T) {
 	}
 }
 
-func TestGetLogoFromConfig(t *testing.T) {
-	// menu, err := ReadMenuConfig("testdata/wn_config/menu.cfg")
-
-	t.Error("unimplemented")
-}
-
 func TestGetConversionFromInit(t *testing.T) {
-	t.Error("unimplemented")
+	path := "testdata/wn_config/main_init.cfg"
+	init, _ := ReadConversionInit(path)
+
+	fc := new(FullConversion)
+	fc.name = init.Variables.GameName
+	fc.mainInitConfig = path
+	res, err := GetUniqueResources("testdata/" + init.ConfigFiles.Resources)
+	if err != nil {
+		t.Log(err)
+	}
+	fc.uniqueResources = res
+	logo, err := GetLogoFromMenuConfig("testdata/" + init.ConfigFiles.Menu)
+	if err != nil {
+		t.Log(err)
+	}
+	fc.logo = logo
+
+	// Structs with arrays aren't comparable, easiest solution is to cast them to string
+	fcString := fmt.Sprintf("%v", *fc)
+	testString := fmt.Sprintf("%v", TestWhiteNight)
+
+	if fcString != testString {
+		t.Errorf("FC differs from expected. Original:\n%s\nGot:\n%s", testString, fcString)
+	}
 }
 
 func TestGetMainInitConfigs(t *testing.T) {
