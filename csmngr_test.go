@@ -72,7 +72,7 @@ func TestReadCustomStoryConfig(t *testing.T) {
 
 func TestGetDescFromLang(t *testing.T) {
 
-	desc, err := GetDescFromLang("./testdata/custom_stories/_ESCAPE/extra_english.lang")
+	desc, err := GetDescFromLang("testdata/custom_stories/_ESCAPE/extra_english.lang")
 
 	if err != nil {
 		t.Error(err)
@@ -121,7 +121,7 @@ func TestGetStoryNoImg(t *testing.T) {
 
 func TestGetCustomStories(t *testing.T) {
 
-	storyList, err := GetCustomStories("./testdata/custom_stories")
+	storyList, err := GetCustomStories("testdata/custom_stories")
 
 	if err != nil {
 		t.Error(err)
