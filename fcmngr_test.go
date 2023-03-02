@@ -40,23 +40,27 @@ func TestGetUniqueResources(t *testing.T) {
 }
 
 func TestGetLogoFromMenuConfig(t *testing.T) {
-	logo, err := GetLogoFromMenuConfig("testdata/wn_config/menu.cfg")
-	t.Logf("Menu config: %s", logo)
+	logo, err := GetLogoFromMenuConfig("testdata/wn_config/menu.cfg", TestWhiteNight.uniqueResources)
+	t.Logf("Logo path: %s", logo)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if logo != "wn_menu_logo.png" {
+	if logo != "testdata/wn_graphics/graphics/main_menu/wn_menu_logo.png" {
 		t.Errorf("Wrong FC logo: %s", logo)
 	}
 }
 
 func TestGetConversionFromInit(t *testing.T) {
-	path := "testdata/wn_config/main_init.cfg"
+	path := "wn_config/main_init.cfg"
 	fc, err := GetConversionFromInit(path, "testdata")
 	if err != nil {
-		t.Error(err)
+		t.Errorf("GetConversionFromInit returned an error: %s", err)
+	}
+
+	if fc == nil {
+		t.Fatal("FATAL: GetConversionFromInit returned nil")
 	}
 
 	// Structs with arrays aren't comparable, easiest solution is to cast them to string

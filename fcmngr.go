@@ -40,13 +40,12 @@ func GetMainInitConfigs(workdir string) ([]string, error) {
 
 	mainInits := make([]string, 0)
 
-	fs.WalkDir(fileSystem, workdir, func(path string, d fs.DirEntry, err error) error {
-		if !d.IsDir() && d.Name() == mainInitStr {
-			mainInits = append(mainInits, path)
-		}
-
+	fs.WalkDir(fileSystem, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			ErrorLogger.Println(err, "in", path)
+		}
+		if !d.IsDir() && d.Name() == mainInitStr {
+			mainInits = append(mainInits, path)
 		}
 		return nil
 	})
@@ -119,11 +118,11 @@ func GetUniqueResources(path string) ([]string, error) {
 	}
 }
 
-func GetLogoFromMenuConfig(path string) (string, error) {
-	data, err := os.ReadFile(path)
+func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) {
+	data, err := os.ReadFile(filepath)
 	if err != nil {
 		if strings.Contains(err.Error(), "no such file or directory") {
-			WarningLogger.Println(path, ": specified menu.cfg file doesn't exist")
+			WarningLogger.Println("GetLogoFromMenuConfig: file", filepath, "doesn't exist")
 			return "", nil
 		} else {
 			return "", err
@@ -136,15 +135,51 @@ func GetLogoFromMenuConfig(path string) (string, error) {
 	menu := new(MenuXML)
 	empty := new(MenuXML)
 	err = xml.Unmarshal(data, menu)
-
-	if *menu == *empty {
-		return "", errors.New(path + ": XML parser returned an empty object")
-	}
-
 	if err != nil {
 		return "", err
+	}
+
+	if *menu == *empty {
+		return "", errors.New("GetLogoFromMenuConfig: " + filepath + ": XML parser returned an empty object")
+	}
+
+	// Find the logo path
+	fileSystem := os.DirFS(".")
+	logoCandidates := make([]string, 0)
+
+	walkFunc := func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			ErrorLogger.Println(err, "in", path)
+		}
+		if !d.IsDir() && d.Name() == menu.Main.MenuLogo {
+			alreadyFound := false
+			for _, candidate := range logoCandidates {
+				if path == candidate {
+					alreadyFound = true
+					break
+				}
+			}
+			if !alreadyFound {
+				logoCandidates = append(logoCandidates, path)
+			}
+		}
+		return nil
+	}
+
+	// Search custom resource dirs first
+	// (same name as vanilla logo could have been used, so we can't just search from root once)
+	for _, res := range resources {
+		fs.WalkDir(fileSystem, mainWorkdir+res, walkFunc)
+	}
+
+	// Search base game folders as a last ditch resort; this will search some dirs again so walkFunc checks for doubles
+	fs.WalkDir(fileSystem, ".", walkFunc)
+
+	InfoLogger.Println("Logo candidates:", logoCandidates)
+	if len(logoCandidates) == 0 {
+		return "", errors.New("mod logo could not be found")
 	} else {
-		return menu.Main.MenuLogo, nil
+		return logoCandidates[0], nil
 	}
 }
 
@@ -166,7 +201,7 @@ func GetConversionFromInit(path, workdir string) (*FullConversion, error) {
 		return nil, err
 	}
 	fc.uniqueResources = res
-	logo, err := GetLogoFromMenuConfig(workdir + init.ConfigFiles.Menu)
+	logo, err := GetLogoFromMenuConfig(workdir+init.ConfigFiles.Menu, res)
 	if err != nil {
 		return nil, err
 	}

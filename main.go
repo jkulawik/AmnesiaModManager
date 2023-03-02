@@ -21,13 +21,14 @@ import (
 )
 
 const (
-	appInfo = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
-	workdir = "testdata"
+	appInfo     = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+	mainWorkdir = "testdata"
 )
 
 var (
 	WarningLogger *log.Logger
 	ErrorLogger   *log.Logger
+	InfoLogger    *log.Logger
 
 	csPath          string
 	customStories   []*CustomStory
@@ -45,6 +46,7 @@ var (
 func initLoggers() {
 	WarningLogger = log.New(os.Stderr, "WARNING: ", log.Lshortfile)
 	ErrorLogger = log.New(os.Stderr, "ERROR: ", log.Lshortfile)
+	InfoLogger = log.New(os.Stderr, "INFO: ", log.Lshortfile)
 }
 
 func main() {
@@ -54,17 +56,17 @@ func main() {
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
 	w := a.NewWindow("Amnesia Mod Manager")
 
-	err := CheckIsRootDir(workdir)
+	err := CheckIsRootDir(mainWorkdir)
 	displayIfError(err, w)
 
-	if workdir == "" {
+	if mainWorkdir == "" {
 		csPath = "custom_stories"
 	} else {
-		csPath = workdir + "/custom_stories"
+		csPath = mainWorkdir + "/custom_stories"
 	}
 	customStories, err = GetCustomStories(csPath)
 	displayIfError(err, w)
-	fullConversions, err = GetFullConversions(workdir)
+	fullConversions, err = GetFullConversions(mainWorkdir)
 	displayIfError(err, w)
 
 	windowContent = container.NewMax()
@@ -192,7 +194,7 @@ func refreshMods(w fyne.Window) {
 	var err error
 	customStories, err = GetCustomStories(csPath)
 	displayIfError(err, w)
-	fullConversions, err = GetFullConversions(workdir)
+	fullConversions, err = GetFullConversions(mainWorkdir)
 	displayIfError(err, w)
 
 	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
