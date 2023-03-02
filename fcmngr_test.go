@@ -83,7 +83,7 @@ func TestGetMainInitConfigs(t *testing.T) {
 }
 
 func TestGetFullConversions(t *testing.T) {
-	fcList, err := GetFullConversions("testdata", t)
+	fcList, err := GetFullConversions("testdata")
 
 	if err != nil {
 		t.Error(err)

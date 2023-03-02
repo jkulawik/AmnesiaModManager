@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"os"
 	"strings"
-	"testing"
 )
 
 var baseResources = []string{
@@ -172,7 +171,7 @@ func GetConversionFromInit(path string) (*FullConversion, error) {
 	return fc, nil
 }
 
-func GetFullConversions(workdir string, t *testing.T) ([]*FullConversion, error) {
+func GetFullConversions(workdir string) ([]*FullConversion, error) {
 
 	initList, err := GetMainInitConfigs(workdir)
 
