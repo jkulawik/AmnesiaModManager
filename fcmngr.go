@@ -197,5 +197,5 @@ func GetFullConversions(workdir string, t *testing.T) ([]*FullConversion, error)
 		return nil, errors.New("did not find any full conversions")
 	}
 
-	return nil, nil
+	return fcList, nil
 }

@@ -69,7 +69,7 @@ func TestGetConversionFromInit(t *testing.T) {
 }
 
 func TestGetMainInitConfigs(t *testing.T) {
-	mainInits, err := GetMainInitConfigs("testdata")
+	mainInits, err := GetMainInitConfigs("testdata") // FIXME adding a trailing slash casuses runtime panic
 
 	if err != nil {
 		t.Error(err)
@@ -83,11 +83,17 @@ func TestGetMainInitConfigs(t *testing.T) {
 }
 
 func TestGetFullConversions(t *testing.T) {
-	_, err := GetFullConversions("testdata", t)
+	fcList, err := GetFullConversions("testdata", t)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	t.Error("unimplemented")
+	for _, fc := range fcList {
+		t.Log(fc)
+	}
+
+	if len(fcList) != 2 {
+		t.Errorf("FC list wasn't the expected length. Expected 2, got %d", len(fcList))
+	}
 }

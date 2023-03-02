@@ -21,7 +21,7 @@ import (
 )
 
 const appInfo = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
-const workdir = ""
+const workdir = "workdir"
 
 var csPath string
 var customStories []*CustomStory
