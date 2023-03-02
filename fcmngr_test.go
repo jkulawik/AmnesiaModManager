@@ -8,7 +8,7 @@ import (
 var TestWhiteNight = FullConversion{
 	name:            "White Night",
 	mainInitConfig:  "testdata/wn_config/main_init.cfg",
-	logo:            "wn_menu_logo.png",
+	logo:            "testdata/wn_graphics/graphics/main_menu/wn_menu_logo.png",
 	uniqueResources: []string{"/wn_models", "/wn_sounds", "/wn_graphics", "/wn_models", "/wn_music"},
 }
 
@@ -53,7 +53,7 @@ func TestGetLogoFromMenuConfig(t *testing.T) {
 }
 
 func TestGetConversionFromInit(t *testing.T) {
-	path := "wn_config/main_init.cfg"
+	path := "testdata/wn_config/main_init.cfg"
 	fc, err := GetConversionFromInit("testdata", path)
 	if err != nil {
 		t.Errorf("GetConversionFromInit returned an error: %s", err)
