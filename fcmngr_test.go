@@ -54,7 +54,7 @@ func TestGetLogoFromMenuConfig(t *testing.T) {
 
 func TestGetConversionFromInit(t *testing.T) {
 	path := "wn_config/main_init.cfg"
-	fc, err := GetConversionFromInit(path, "testdata")
+	fc, err := GetConversionFromInit("testdata", path)
 	if err != nil {
 		t.Errorf("GetConversionFromInit returned an error: %s", err)
 	}

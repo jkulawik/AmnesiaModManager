@@ -183,7 +183,7 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 	}
 }
 
-func GetConversionFromInit(path, workdir string) (*FullConversion, error) {
+func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 	init, err := ReadConversionInit(path)
 	if err != nil {
 		return nil, err
@@ -221,7 +221,7 @@ func GetFullConversions(workdir string) ([]*FullConversion, error) {
 	fcList := make([]*FullConversion, 0, len(initList))
 
 	for _, init := range initList {
-		fc, err := GetConversionFromInit(init, workdir)
+		fc, err := GetConversionFromInit(workdir, init)
 
 		if err != nil {
 			return nil, err
