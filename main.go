@@ -102,8 +102,8 @@ func makeModTypeTabs() fyne.CanvasObject {
 	fcTabContent.Refresh()
 
 	return container.NewAppTabs(
-		container.NewTabItem("Custom Stories", csTabContent),
 		container.NewTabItem("Full Conversions", fcTabContent),
+		container.NewTabItem("Custom Stories", csTabContent),
 	)
 }
 
@@ -201,16 +201,21 @@ func refreshMods(w fyne.Window) {
 	windowContent.Refresh()
 }
 
+func formatStringList(list []string) string {
+	folderList := ""
+	for _, f := range selectedMod.listFolders() {
+		folderList += f + "\n"
+	}
+	return folderList
+}
+
 func deleteSelectedMod(w fyne.Window) {
 	if selectedMod == nil {
 		displayIfError(errors.New("no mod selected"), w)
 		return
 	}
 
-	folderList := ""
-	for _, f := range selectedMod.listFolders() {
-		folderList += f + "\n"
-	}
+	folderList := formatStringList(selectedMod.listFolders())
 
 	warningMessage := "Delete the following folders?\n\n" + folderList
 	warningMessage += "\nAll files will be deleted permanently.\n\nMod saves will not be deleted."
@@ -242,7 +247,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	cardContentLabel := widget.NewLabel("")
 	cardContentLabel.Wrapping = fyne.TextWrapWord
 
-	defaultTitle := "Select a custom story"
+	defaultTitle := "Select a full conversion"
 	card := widget.NewCard(defaultTitle, "", cardContentLabel)
 
 	defaultImgRaw, _ := defaultImgFS.Open("default.jpg")
@@ -250,7 +255,10 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	var defaultImg = canvas.NewImageFromImage(img)
 	card.Image = nil
 
-	convViewContainer := container.New(layout.NewMaxLayout(), defaultImg, card)
+	hbox := container.NewHBox(card)
+
+	// convViewContainer := container.New(layout.NewMaxLayout(), defaultImg, card)
+	convViewContainer := container.New(layout.NewMaxLayout(), defaultImg, hbox)
 
 	list := widget.NewList(
 		func() int {
@@ -265,15 +273,21 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	)
 	list.OnSelected = func(id widget.ListItemID) {
 		selectedMod = data[id]
-		card.SetTitle(data[id].name)
 		// card.SetSubTitle("Author: " + data[id].author)
 		// cardContentLabel.SetText(makeStoryText(data[id]))
+		cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
+		folderString := formatStringList(data[id].uniqueResources)
+		cardContentLabel.SetText("Mod folder(s):\n" + folderString)
 
 		if data[id].logo == "" {
 			card.SetImage(nil)
+			card.SetTitle(data[id].name)
 		} else {
+			card.SetTitle(data[id].name) // we have the logo, no need to clutter the space further
+			// card.SetSubTitle(getStringSpacer(90)) // to not let the card shrink too much
+			card.SetSubTitle("")
 			displayImg := canvas.NewImageFromFile(data[id].logo)
-			displayImg.FillMode = canvas.ImageFillContain
+			displayImg.FillMode = canvas.ImageFillOriginal
 			card.SetImage(displayImg)
 		}
 	}
@@ -287,4 +301,12 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	listTab := container.NewHSplit(list, convViewContainer)
 	listTab.SetOffset(0.3)
 	return listTab
+}
+
+func getStringSpacer(width int) string {
+	spacer := ""
+	for i := 0; i < width; i++ {
+		spacer += " "
+	}
+	return spacer
 }
