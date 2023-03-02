@@ -192,7 +192,7 @@ func GetCustomStories(dir string) ([]*CustomStory, error) {
 			}
 			if err != nil {
 				ErrorLogger.Println(err)
-				//Can't return nil dueo to an error because finding one doesn't mean the entire list is invalid
+				// Can't return nil due to an error because finding one doesn't mean the entire list is invalid
 			}
 		}
 	}
