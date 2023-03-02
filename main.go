@@ -20,24 +20,26 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-const appInfo = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
-const workdir = "testdata"
-
-var csPath string
-var customStories []*CustomStory
-var selectedMod Mod
-
-//go:embed default.jpg
-var defaultImgFS embed.FS
-
-//go:embed icon.png
-var iconBytes []byte
-
-var windowContent *fyne.Container
+const (
+	appInfo = "Amnesia Mod Manager v1.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+	workdir = "testdata"
+)
 
 var (
 	WarningLogger *log.Logger
 	ErrorLogger   *log.Logger
+
+	csPath          string
+	customStories   []*CustomStory
+	fullConversions []*FullConversion
+	selectedMod     Mod
+
+	windowContent *fyne.Container
+
+	//go:embed default.jpg
+	defaultImgFS embed.FS
+	//go:embed icon.png
+	iconBytes []byte
 )
 
 func initLoggers() {
@@ -61,6 +63,8 @@ func main() {
 		csPath = workdir + "/custom_stories"
 	}
 	customStories, err = GetCustomStories(csPath)
+	displayIfError(err, w)
+	fullConversions, err = GetFullConversions(workdir)
 	displayIfError(err, w)
 
 	windowContent = container.NewMax()
@@ -162,7 +166,7 @@ func makeToolbar(window fyne.Window, app fyne.App) fyne.CanvasObject {
 		widget.NewToolbarAction(theme.InfoIcon(), func() { dialog.ShowInformation("About", appInfo, window) }),
 		widget.NewToolbarAction(theme.SettingsIcon(), func() { showSettings(app) }),
 		//widget.NewToolbarAction(theme.ConfirmIcon(), func() { fmt.Println("Mark") }),
-		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() { refreshCustomStories(window) }),
+		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() { refreshMods(window) }),
 		widget.NewToolbarSpacer(),
 		widget.NewToolbarAction(theme.DeleteIcon(), func() { deleteSelectedMod(window) }),
 	)
@@ -176,9 +180,11 @@ func showSettings(a fyne.App) {
 	w.Show()
 }
 
-func refreshCustomStories(w fyne.Window) {
+func refreshMods(w fyne.Window) {
 	var err error
 	customStories, err = GetCustomStories(csPath)
+	displayIfError(err, w)
+	fullConversions, err = GetFullConversions(workdir)
 	displayIfError(err, w)
 
 	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
@@ -216,4 +222,62 @@ func confirmDeleteCallback(response bool) {
 			// TODO Refresh
 		}
 	}
+}
+
+// ----------------------- FC tab ----------------------- //
+
+func makeFullConversionListTab() fyne.CanvasObject {
+	var data = customStories
+
+	cardContentLabel := widget.NewLabel("")
+	cardContentLabel.Wrapping = fyne.TextWrapWord
+
+	defaultTitle := "Select a custom story"
+	card := widget.NewCard(defaultTitle, "", cardContentLabel)
+
+	defaultImgRaw, _ := defaultImgFS.Open("default.jpg")
+	img, _ := jpeg.Decode(defaultImgRaw)
+	var defaultImg = canvas.NewImageFromImage(img)
+	//card.Image = defaultImg
+	displayImg := defaultImg
+
+	storyViewContainer := container.New(layout.NewMaxLayout(), displayImg, card)
+
+	list := widget.NewList(
+		func() int {
+			return len(data)
+		},
+		func() fyne.CanvasObject {
+			return container.New(layout.NewHBoxLayout(), widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
+		},
+		func(id widget.ListItemID, item fyne.CanvasObject) {
+			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id].name)
+		},
+	)
+	list.OnSelected = func(id widget.ListItemID) {
+		selectedMod = data[id]
+		card.SetTitle(data[id].name)
+		card.SetSubTitle("Author: " + data[id].author)
+		cardContentLabel.SetText(makeStoryText(data[id]))
+
+		if data[id].imgFile == "" {
+			// card.SetImage(defaultImg)
+			displayImg = defaultImg
+		} else {
+			imgFile := data[id].dir + data[id].imgFile
+			displayImg = canvas.NewImageFromFile(imgFile)
+			// card.SetImage(displayImg)
+		}
+		storyViewContainer.Objects[0] = displayImg
+	}
+	list.OnUnselected = func(id widget.ListItemID) {
+		selectedMod = nil
+		card.SetTitle(defaultTitle)
+		card.SetSubTitle("")
+		cardContentLabel.SetText("")
+	}
+	// listTab := container.NewHSplit(list, container.New(layout.NewVBoxLayout(), card))
+	listTab := container.NewHSplit(list, storyViewContainer)
+	listTab.SetOffset(0.3)
+	return listTab
 }
