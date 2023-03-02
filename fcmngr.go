@@ -213,6 +213,7 @@ func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 func GetFullConversions(workdir string) ([]*FullConversion, error) {
 
 	initList, err := GetMainInitConfigs(workdir)
+	InfoLogger.Println("Found main init configs:", initList)
 
 	if err != nil {
 		return nil, err
