@@ -27,7 +27,12 @@ type FullConversion struct {
 	uniqueResources []string
 }
 
-var _ Mod = (*CustomStory)(nil) // Check if CS implements interface (at compile time)
+func (fc FullConversion) listFolders() []string {
+	return fc.uniqueResources
+}
+
+var _ Mod = (*CustomStory)(nil)    // Check if CS implements interface (at compile time)
+var _ Mod = (*FullConversion)(nil) // Check if CS implements interface (at compile time)
 
 // ------ Custom story config XML ------ //
 
