@@ -5,6 +5,11 @@ import (
 	"os"
 )
 
+var execMap = map[string]string{
+	"windows": ".\\Amnesia_NoSteam.exe",
+	"linux":   "./Amnesia_NOSTEAM.bin.x86_64",
+}
+
 func CheckIsRootDir(dir string) error {
 	if dir == "" {
 		dir = "."
