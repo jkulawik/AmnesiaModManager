@@ -144,6 +144,14 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 		return "", errors.New("GetLogoFromMenuConfig: " + filepath + ": XML parser returned an empty object")
 	}
 
+	var searchName string
+	if menu.Main.MenuLogo == "" {
+		InfoLogger.Println("Mod doesn't specify a logo. Trying default name")
+		searchName = "menu_logo.tga"
+	} else {
+		searchName = menu.Main.MenuLogo
+	}
+
 	// Find the logo path
 	fileSystem := os.DirFS(".")
 	logoCandidates := make([]string, 0)
@@ -153,7 +161,7 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 			ErrorLogger.Println(err)
 			return err
 		}
-		if !d.IsDir() && d.Name() == menu.Main.MenuLogo {
+		if !d.IsDir() && d.Name() == searchName {
 			alreadyFound := false
 			for _, candidate := range logoCandidates {
 				if path == candidate {
