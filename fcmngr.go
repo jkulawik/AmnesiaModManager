@@ -136,17 +136,16 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 	menu := new(MenuXML)
 	empty := new(MenuXML)
 	err = xml.Unmarshal(data, menu)
-	if err != nil {
-		return "", err
-	}
-
-	if *menu == *empty {
-		return "", errors.New("GetLogoFromMenuConfig: " + filepath + ": XML parser returned an empty object")
-	}
 
 	var searchName string
 	if menu.Main.MenuLogo == "" {
 		InfoLogger.Println("Mod doesn't specify a logo. Trying default name")
+		searchName = "menu_logo.tga"
+	} else if err != nil {
+		ErrorLogger.Println(err)
+		searchName = "menu_logo.tga"
+	} else if *menu == *empty {
+		WarningLogger.Println("GetLogoFromMenuConfig: " + filepath + ": XML parser returned an empty object. Trying default name")
 		searchName = "menu_logo.tga"
 	} else {
 		searchName = menu.Main.MenuLogo
@@ -179,7 +178,11 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 	// Search custom resource dirs first
 	// (same name as vanilla logo could have been used, so we can't just search from root once)
 	for _, res := range resources {
-		fs.WalkDir(fileSystem, res, walkFunc)
+		var searchRoot string
+		if string(res[0]) == "/" {
+			searchRoot = res[1:]
+		}
+		fs.WalkDir(fileSystem, searchRoot, walkFunc)
 	}
 
 	// Search base game folders as a last ditch resort; this will search some dirs again so walkFunc checks for doubles
