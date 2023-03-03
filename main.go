@@ -85,11 +85,17 @@ func main() {
 	w.ShowAndRun()
 }
 
-func displayIfError(err error, w fyne.Window) {
-	if err != nil {
-		ErrorLogger.Println(err)
-		dialog.ShowError(err, w)
-	}
+func makeToolbar(window fyne.Window, app fyne.App) fyne.CanvasObject {
+	t := widget.NewToolbar(
+		widget.NewToolbarAction(theme.InfoIcon(), func() { dialog.ShowInformation("About", appInfo, window) }),
+		widget.NewToolbarAction(theme.SettingsIcon(), func() { showSettings(app) }),
+		//widget.NewToolbarAction(theme.ConfirmIcon(), func() { fmt.Println("Mark") }),
+		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() { refreshMods(window) }),
+		widget.NewToolbarSpacer(),
+		widget.NewToolbarAction(theme.QuestionIcon(), func() { dialog.ShowInformation("Help: Deleting mods", helpDeleteInfo, window) }),
+		widget.NewToolbarAction(theme.DeleteIcon(), func() { deleteSelectedMod(window) }),
+	)
+	return t
 }
 
 func makeModTypeTabs() fyne.CanvasObject {
@@ -172,17 +178,11 @@ func makeStoryText(cs *CustomStory) string {
 
 // ----------------------- General ----------------------- //
 
-func makeToolbar(window fyne.Window, app fyne.App) fyne.CanvasObject {
-	t := widget.NewToolbar(
-		widget.NewToolbarAction(theme.InfoIcon(), func() { dialog.ShowInformation("About", appInfo, window) }),
-		widget.NewToolbarAction(theme.SettingsIcon(), func() { showSettings(app) }),
-		//widget.NewToolbarAction(theme.ConfirmIcon(), func() { fmt.Println("Mark") }),
-		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() { refreshMods(window) }),
-		widget.NewToolbarSpacer(),
-		widget.NewToolbarAction(theme.QuestionIcon(), func() { dialog.ShowInformation("Help: Deleting mods", helpDeleteInfo, window) }),
-		widget.NewToolbarAction(theme.DeleteIcon(), func() { deleteSelectedMod(window) }),
-	)
-	return t
+func displayIfError(err error, w fyne.Window) {
+	if err != nil {
+		ErrorLogger.Println(err)
+		dialog.ShowError(err, w)
+	}
 }
 
 func showSettings(a fyne.App) {
@@ -201,14 +201,6 @@ func refreshMods(w fyne.Window) {
 
 	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
 	windowContent.Refresh()
-}
-
-func formatStringList(list []string) string {
-	folderList := ""
-	for _, f := range selectedMod.listFolders() {
-		folderList += f + "\n"
-	}
-	return folderList
 }
 
 func deleteSelectedMod(w fyne.Window) {
@@ -333,14 +325,6 @@ func getImageFromFile(path string) *canvas.Image {
 	} else {
 		return canvas.NewImageFromFile(path)
 	}
-}
-
-func getStringSpacer(width int) string {
-	spacer := ""
-	for i := 0; i < width; i++ {
-		spacer += " "
-	}
-	return spacer
 }
 
 func launchFullConversion() {

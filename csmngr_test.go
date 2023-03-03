@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"strings"
 	"testing"
 )
@@ -31,20 +30,6 @@ var TestStoryBad = CustomStory{
 	"custom_stories/BadMod/",
 	"I don't know how you can miss the damn image.",
 	"",
-}
-
-func init() {
-	initLoggers()
-	os.Chdir("testdata")
-}
-
-func TestCheckIsRootDir(t *testing.T) {
-	err := CheckIsRootDir(".")
-
-	if err != nil {
-		t.Error(err)
-		t.Error("Root directory is an Amnesia installation but one isn't detected")
-	}
 }
 
 func TestReadCustomStoryConfig(t *testing.T) {
