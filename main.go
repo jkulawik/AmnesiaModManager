@@ -53,7 +53,7 @@ func initLoggers() {
 }
 
 func main() {
-	os.Chdir("testdata")
+	os.Chdir("testdata") // Debug
 	initLoggers()
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
@@ -293,9 +293,9 @@ func makeFullConversionListTab() fyne.CanvasObject {
 			card.SetImage(nil)
 			card.SetTitle(data[id].name)
 		} else {
-			card.SetTitle(data[id].name) // we have the logo, no need to clutter the space further
+			card.SetTitle(data[id].name) // TODO we have the logo, no need to clutter the space further?
 			// card.SetSubTitle(getStringSpacer(90)) // to not let the card shrink too much
-			card.SetSubTitle("")
+			// card.SetSubTitle("")
 
 			displayImg := getImageFromFile(data[id].logo)
 			displayImg.FillMode = canvas.ImageFillOriginal
