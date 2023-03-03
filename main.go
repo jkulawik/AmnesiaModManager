@@ -328,14 +328,11 @@ func loadTGA(path string) image.Image {
 }
 
 func getImageFromFile(path string) *canvas.Image {
-	InfoLogger.Println("Loading image", path)
 	// return canvas.NewImageFromFile(path)
 	if strings.Contains(path, ".tga") {
-		InfoLogger.Println("TGA logo", path)
 		img := loadTGA(path)
 		return canvas.NewImageFromImage(img)
 	} else {
-		InfoLogger.Println("Non-TGA logo", path)
 		return canvas.NewImageFromFile(path)
 	}
 }
