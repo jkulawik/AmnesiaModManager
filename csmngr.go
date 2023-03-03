@@ -3,9 +3,14 @@ package main
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 )
+
+func makeStoryText(cs *CustomStory) string {
+	return fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.dir, cs.desc)
+}
 
 func ReadCustomStoryConfig(filepath string) (*CSXML, error) {
 
