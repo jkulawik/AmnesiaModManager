@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"fmt"
 	"image/jpeg"
 
 	"fyne.io/fyne/v2"
@@ -36,10 +35,12 @@ var (
 	ErrorLogger   *log.Logger
 	InfoLogger    *log.Logger
 
-	csPath          string = "custom_stories"
-	customStories   []*CustomStory
-	fullConversions []*FullConversion
-	selectedMod     Mod
+	csPath             string = "custom_stories"
+	customStories      []*CustomStory
+	fullConversions    []*FullConversion
+	selectedStory      *CustomStory
+	selectedConversion *FullConversion
+	selectedMod        Mod
 
 	defaultImg    *canvas.Image
 	windowContent *fyne.Container
@@ -114,10 +115,22 @@ func makeModTypeTabs() fyne.CanvasObject {
 	fcTabContent.Objects = []fyne.CanvasObject{makeFullConversionListTab()}
 	fcTabContent.Refresh()
 
-	return container.NewAppTabs(
+	tabs := container.NewAppTabs(
 		container.NewTabItem("Full Conversions", fcTabContent),
 		container.NewTabItem("Custom Stories", csTabContent),
 	)
+
+	tabs.OnSelected = setCurrentMod
+
+	return tabs
+}
+
+func setCurrentMod(currentTab *container.TabItem) {
+	if currentTab.Text == "Full Conversions" {
+		selectedMod = selectedConversion
+	} else if currentTab.Text == "Custom Stories" {
+		selectedMod = selectedStory
+	}
 }
 
 // ----------------------- Custom Stories ----------------------- //
@@ -148,7 +161,8 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 		},
 	)
 	list.OnSelected = func(id widget.ListItemID) {
-		selectedMod = data[id]
+		selectedStory = data[id]
+		selectedMod = selectedStory
 		card.SetTitle(data[id].name)
 		card.SetSubTitle("Author: " + data[id].author)
 		cardContentLabel.SetText(makeStoryText(data[id]))
@@ -164,6 +178,7 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 		storyViewContainer.Objects[0] = displayImg
 	}
 	list.OnUnselected = func(id widget.ListItemID) {
+		selectedStory = nil
 		selectedMod = nil
 		card.SetTitle(defaultTitle)
 		card.SetSubTitle("")
@@ -173,10 +188,6 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 	listTab := container.NewHSplit(list, storyViewContainer)
 	listTab.SetOffset(0.3)
 	return listTab
-}
-
-func makeStoryText(cs *CustomStory) string {
-	return fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.dir, cs.desc)
 }
 
 // ----------------------- General ----------------------- //
@@ -197,6 +208,11 @@ func showSettings(a fyne.App) {
 
 func refreshMods(w fyne.Window) {
 	var err error
+
+	selectedConversion = nil
+	selectedStory = nil
+	selectedMod = nil
+
 	customStories, err = GetCustomStories(csPath)
 	displayIfError(err, w)
 	fullConversions, err = GetFullConversions()
@@ -270,7 +286,8 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		},
 	)
 	list.OnSelected = func(id widget.ListItemID) {
-		selectedMod = data[id]
+		selectedConversion = data[id]
+		selectedMod = selectedConversion
 		// card.SetSubTitle("Author: " + data[id].author)
 		// cardContentLabel.SetText(makeStoryText(data[id]))
 		// cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
@@ -295,6 +312,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	}
 	list.OnUnselected = func(id widget.ListItemID) {
 		selectedMod = nil
+		selectedConversion = nil
 		card.SetTitle(defaultTitle)
 		card.SetSubTitle("")
 		cardContentLabel.SetText("")
@@ -329,4 +347,9 @@ func getImageFromFile(path string) *canvas.Image {
 
 func launchFullConversion() {
 	InfoLogger.Println("Launch button pressed")
+	// gameExe := execMap[runtime.GOOS]
+
+	// cmd := exec.Command(gameExe + " prog")
+	// err := cmd.Run()
+	// displayIfError(err)
 }
