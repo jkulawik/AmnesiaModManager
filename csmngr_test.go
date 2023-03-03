@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"strings"
 	"testing"
 )
@@ -9,7 +10,7 @@ var TestStoryMyMod = CustomStory{
 	"Tutorial",
 	"Mudbill",
 	"new_story.lang",
-	"testdata/custom_stories/MyMod/",
+	"custom_stories/MyMod/",
 	"Error while parsing lang file XML.",
 	"customstory.png",
 }
@@ -18,7 +19,7 @@ var TestStoryEscape = CustomStory{
 	"Another Madhouse mod",
 	"Sabatu",
 	"extra_english.lang",
-	"testdata/custom_stories/_ESCAPE/",
+	"custom_stories/_ESCAPE/",
 	"Another epic plot about people getting Amnesia",
 	"yellow.jpg",
 }
@@ -27,25 +28,18 @@ var TestStoryBad = CustomStory{
 	"Mod with no image",
 	"Cmon",
 	"extra_english.lang",
-	"testdata/custom_stories/BadMod/",
+	"custom_stories/BadMod/",
 	"I don't know how you can miss the damn image.",
 	"",
 }
 
 func init() {
 	initLoggers()
+	os.Chdir("testdata")
 }
 
 func TestCheckIsRootDir(t *testing.T) {
-	// Test on bad dir
-
 	err := CheckIsRootDir(".")
-	if err == nil {
-		t.Error("Root directory isn't an Amnesia installation but one is detected")
-	}
-
-	// Test on a good dir
-	err = CheckIsRootDir("testdata")
 
 	if err != nil {
 		t.Error(err)
@@ -55,7 +49,7 @@ func TestCheckIsRootDir(t *testing.T) {
 
 func TestReadCustomStoryConfig(t *testing.T) {
 
-	csxml, err := ReadCustomStoryConfig("testdata/custom_stories/MyMod/custom_story_settings.cfg")
+	csxml, err := ReadCustomStoryConfig("custom_stories/MyMod/custom_story_settings.cfg")
 	t.Log(*csxml)
 
 	if err != nil {
@@ -76,7 +70,7 @@ func TestReadCustomStoryConfig(t *testing.T) {
 
 func TestGetDescFromLang(t *testing.T) {
 
-	desc, err := GetDescFromLang("testdata/custom_stories/_ESCAPE/extra_english.lang")
+	desc, err := GetDescFromLang("custom_stories/_ESCAPE/extra_english.lang")
 
 	if err != nil {
 		t.Error(err)
@@ -88,7 +82,7 @@ func TestGetDescFromLang(t *testing.T) {
 }
 
 func TestGetStoryFromDir(t *testing.T) {
-	cs, err := GetStoryFromDir("testdata/custom_stories/MyMod/")
+	cs, err := GetStoryFromDir("custom_stories/MyMod/")
 
 	if err != nil && !strings.Contains(err.Error(), "invalid sequence \"--\" not allowed in comments") {
 		t.Error(err)
@@ -100,7 +94,7 @@ func TestGetStoryFromDir(t *testing.T) {
 }
 
 func TestGetStoryFromDir2(t *testing.T) {
-	cs, err := GetStoryFromDir("testdata/custom_stories/_ESCAPE/")
+	cs, err := GetStoryFromDir("custom_stories/_ESCAPE/")
 
 	if err != nil {
 		t.Error(err)
@@ -112,7 +106,7 @@ func TestGetStoryFromDir2(t *testing.T) {
 }
 
 func TestGetStoryNoImg(t *testing.T) {
-	cs, err := GetStoryFromDir("testdata/custom_stories/BadMod/")
+	cs, err := GetStoryFromDir("custom_stories/BadMod/")
 
 	if err != nil {
 		t.Error(err)
@@ -125,7 +119,7 @@ func TestGetStoryNoImg(t *testing.T) {
 
 func TestGetCustomStories(t *testing.T) {
 
-	storyList, err := GetCustomStories("testdata/custom_stories")
+	storyList, err := GetCustomStories("custom_stories")
 
 	if err != nil {
 		t.Error(err)

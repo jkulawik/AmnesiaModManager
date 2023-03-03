@@ -35,7 +35,7 @@ var baseResources = []string{
 
 const mainInitStr = "main_init.cfg"
 
-func GetMainInitConfigs(workdir string) ([]string, error) {
+func GetMainInitConfigs() ([]string, error) {
 	fileSystem := os.DirFS(".")
 
 	mainInits := make([]string, 0)
@@ -119,7 +119,7 @@ func GetUniqueResources(path string) ([]string, error) {
 	}
 }
 
-func GetLogoFromMenuConfig(filepath string, resources []string, workdir string) (string, error) {
+func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 		if strings.Contains(err.Error(), "no such file or directory") {
@@ -171,7 +171,7 @@ func GetLogoFromMenuConfig(filepath string, resources []string, workdir string) 
 	// Search custom resource dirs first
 	// (same name as vanilla logo could have been used, so we can't just search from root once)
 	for _, res := range resources {
-		fs.WalkDir(fileSystem, workdir+res, walkFunc)
+		fs.WalkDir(fileSystem, res, walkFunc)
 	}
 
 	// Search base game folders as a last ditch resort; this will search some dirs again so walkFunc checks for doubles
@@ -185,26 +185,22 @@ func GetLogoFromMenuConfig(filepath string, resources []string, workdir string) 
 	}
 }
 
-func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
+func GetConversionFromInit(path string) (*FullConversion, error) {
 	init, err := ReadConversionInit(path)
 	if err != nil {
 		return nil, err
 	}
 
-	if workdir == "" {
-		workdir = "."
-	}
-
 	fc := new(FullConversion)
 	fc.name = init.Variables.GameName
 	fc.mainInitConfig = path
-	res, err := GetUniqueResources(workdir + "/" + init.ConfigFiles.Resources)
+	res, err := GetUniqueResources(init.ConfigFiles.Resources)
 	if err != nil {
 		return nil, err
 	}
 	fc.uniqueResources = res
-	menuPath := workdir + "/" + init.ConfigFiles.Menu
-	logo, err := GetLogoFromMenuConfig(menuPath, res, workdir)
+	menuPath := init.ConfigFiles.Menu
+	logo, err := GetLogoFromMenuConfig(menuPath, res)
 	if err != nil {
 		return nil, err
 	}
@@ -213,24 +209,18 @@ func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 	return fc, nil
 }
 
-func GetFullConversions(workdir string) ([]*FullConversion, error) {
+func GetFullConversions() ([]*FullConversion, error) {
 
-	initList, err := GetMainInitConfigs(workdir)
+	initList, err := GetMainInitConfigs()
 
 	if err != nil {
 		return nil, err
 	}
 
 	// Find and remove base game init
-	var base_init string
-	if workdir == "" {
-		base_init = "config/main_init.cfg"
-	} else {
-		base_init = workdir + "/config/main_init.cfg"
-	}
 
 	for i, init := range initList {
-		if init == base_init {
+		if init == "config/main_init.cfg" {
 			initList = append(initList[:i], initList[i+1:]...)
 			break
 		}
@@ -240,7 +230,7 @@ func GetFullConversions(workdir string) ([]*FullConversion, error) {
 	fcList := make([]*FullConversion, 0, len(initList))
 
 	for _, init := range initList {
-		fc, err := GetConversionFromInit(workdir, init)
+		fc, err := GetConversionFromInit(init)
 
 		if err != nil {
 			ErrorLogger.Println("Error while reading full conversion from", init, "-", err)

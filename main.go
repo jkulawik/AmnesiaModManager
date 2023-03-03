@@ -50,7 +50,7 @@ func initLoggers() {
 }
 
 func main() {
-
+	os.Chdir("testdata")
 	initLoggers()
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
@@ -66,7 +66,7 @@ func main() {
 	}
 	customStories, err = GetCustomStories(csPath)
 	displayIfError(err, w)
-	fullConversions, err = GetFullConversions(mainWorkdir)
+	fullConversions, err = GetFullConversions()
 	displayIfError(err, w)
 
 	windowContent = container.NewMax()
@@ -194,7 +194,7 @@ func refreshMods(w fyne.Window) {
 	var err error
 	customStories, err = GetCustomStories(csPath)
 	displayIfError(err, w)
-	fullConversions, err = GetFullConversions(mainWorkdir)
+	fullConversions, err = GetFullConversions()
 	displayIfError(err, w)
 
 	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
