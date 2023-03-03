@@ -55,9 +55,26 @@ var (
 )
 
 func initLoggers() {
-	WarningLogger = log.New(os.Stderr, "WARNING: ", log.Lshortfile)
-	ErrorLogger = log.New(os.Stderr, "ERROR: ", log.Lshortfile)
-	InfoLogger = log.New(os.Stderr, "INFO: ", log.Lshortfile)
+	var (
+		info       = "[INFO]    "
+		warn       = "[WARNING] "
+		err        = "[ERROR]   "
+		colorReset = "\033[0m"
+	)
+
+	if runtime.GOOS == "linux" {
+		info = "\033[36m" + info + colorReset
+		warn = "\033[33m" + warn + colorReset
+		err = "\033[31m" + err + colorReset
+	}
+
+	InfoLogger = log.New(os.Stderr, info, log.Lshortfile)
+	WarningLogger = log.New(os.Stderr, warn, log.Lshortfile)
+	ErrorLogger = log.New(os.Stderr, err, log.Lshortfile)
+
+	// InfoLogger.Println("test")
+	// WarningLogger.Println("test")
+	// ErrorLogger.Println("test")
 }
 
 func main() {
