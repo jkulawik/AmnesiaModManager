@@ -30,11 +30,11 @@ func CheckIsRootDir(dir string) error {
 
 	// Not checking for Amnesia binaries because their names differ between releases
 
-	if !csInDir {
-		return errors.New("custom story folder not found")
-	}
 	if !coreInDir || !entInDir {
 		return errors.New("work directory is not an Amnesia install")
+	}
+	if !csInDir {
+		return errors.New("custom story folder not found")
 	}
 	if coreInDir && entInDir && csInDir {
 		return nil
