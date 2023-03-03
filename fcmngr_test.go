@@ -32,7 +32,7 @@ func TestGetUniqueResources(t *testing.T) {
 		t.Error(err)
 	}
 
-	if len(res) != 1 || res[0] != "/SomeMod" {
+	if len(res) != 2 || res[0] != "/SomeMod" || res[1] != "/SomeMod/misc" {
 		t.Error("Parsed resource list differs from the expected one")
 		t.Log(res)
 	}

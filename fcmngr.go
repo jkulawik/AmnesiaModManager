@@ -236,7 +236,9 @@ func GetFullConversions() ([]*FullConversion, error) {
 			ErrorLogger.Println("Error while reading full conversion from", init, "-", err)
 		}
 
-		fcList = append(fcList, fc)
+		if fc != nil {
+			fcList = append(fcList, fc)
+		}
 	}
 
 	if len(fcList) == 0 {
