@@ -287,7 +287,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		// cardContentLabel.SetText("Mod folder(s):\n" + folderString)
 		launchButton.Show()
 
-		InfoLogger.Println("Logo for", data[id].name, "is", data[id].logo)
+		// InfoLogger.Println("Logo for", data[id].name, "is", data[id].logo)
 
 		if data[id].logo == "" {
 			card.SetImage(nil)
@@ -328,7 +328,6 @@ func loadTGA(path string) image.Image {
 }
 
 func getImageFromFile(path string) *canvas.Image {
-	// return canvas.NewImageFromFile(path)
 	if strings.Contains(path, ".tga") {
 		img := loadTGA(path)
 		return canvas.NewImageFromImage(img)
