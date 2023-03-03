@@ -139,7 +139,7 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 
 	var searchName string
 	if menu.Main.MenuLogo == "" {
-		InfoLogger.Println("Mod doesn't specify a logo. Trying default name")
+		InfoLogger.Println(filepath, "mod doesn't specify a logo. Trying default name")
 		searchName = "menu_logo.tga"
 	} else if err != nil {
 		ErrorLogger.Println(err)
