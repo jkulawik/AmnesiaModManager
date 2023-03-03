@@ -32,7 +32,7 @@ func (fc FullConversion) listFolders() []string {
 }
 
 var _ Mod = (*CustomStory)(nil)    // Check if CS implements interface (at compile time)
-var _ Mod = (*FullConversion)(nil) // Check if CS implements interface (at compile time)
+var _ Mod = (*FullConversion)(nil) // Check if FC implements interface (at compile time)
 
 // ------ Custom story config XML ------ //
 

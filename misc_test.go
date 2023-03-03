@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCheckIsRootDir(t *testing.T) {
 	err := CheckIsRootDir(".")
