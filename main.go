@@ -3,8 +3,10 @@ package main
 import (
 	"embed"
 	"errors"
+	"image"
 	"log"
 	"os"
+	"strings"
 
 	"fmt"
 	"image/jpeg"
@@ -18,6 +20,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"github.com/ftrvxmtrx/tga"
 )
 
 const (
@@ -279,10 +282,12 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		selectedMod = data[id]
 		// card.SetSubTitle("Author: " + data[id].author)
 		// cardContentLabel.SetText(makeStoryText(data[id]))
-		cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
-		folderString := formatStringList(data[id].uniqueResources)
-		cardContentLabel.SetText("Mod folder(s):\n" + folderString)
+		// cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
+		// folderString := formatStringList(data[id].uniqueResources)
+		// cardContentLabel.SetText("Mod folder(s):\n" + folderString)
 		launchButton.Show()
+
+		InfoLogger.Println("Logo for", data[id].name, "is", data[id].logo)
 
 		if data[id].logo == "" {
 			card.SetImage(nil)
@@ -291,7 +296,8 @@ func makeFullConversionListTab() fyne.CanvasObject {
 			card.SetTitle(data[id].name) // we have the logo, no need to clutter the space further
 			// card.SetSubTitle(getStringSpacer(90)) // to not let the card shrink too much
 			card.SetSubTitle("")
-			displayImg := canvas.NewImageFromFile(data[id].logo)
+
+			displayImg := getImageFromFile(data[id].logo)
 			displayImg.FillMode = canvas.ImageFillOriginal
 			card.SetImage(displayImg)
 		}
@@ -307,6 +313,31 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	listTab := container.NewHSplit(list, fcViewContainer)
 	listTab.SetOffset(0.3)
 	return listTab
+}
+
+func loadTGA(path string) image.Image {
+	imgRaw, err := os.Open(path)
+	if err != nil {
+		ErrorLogger.Println(err)
+	}
+	img, err := tga.Decode(imgRaw)
+	if err != nil {
+		ErrorLogger.Println(err)
+	}
+	return img
+}
+
+func getImageFromFile(path string) *canvas.Image {
+	InfoLogger.Println("Loading image", path)
+	// return canvas.NewImageFromFile(path)
+	if strings.Contains(path, ".tga") {
+		InfoLogger.Println("TGA logo", path)
+		img := loadTGA(path)
+		return canvas.NewImageFromImage(img)
+	} else {
+		InfoLogger.Println("Non-TGA logo", path)
+		return canvas.NewImageFromFile(path)
+	}
 }
 
 func getStringSpacer(width int) string {
