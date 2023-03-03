@@ -120,8 +120,8 @@ func makeModTypeTabs() fyne.CanvasObject {
 	fcTabContent.Refresh()
 
 	tabs := container.NewAppTabs(
-		container.NewTabItem("Full Conversions", fcTabContent),
 		container.NewTabItem("Custom Stories", csTabContent),
+		container.NewTabItem("Full Conversions", fcTabContent),
 	)
 
 	tabs.OnSelected = setCurrentMod
