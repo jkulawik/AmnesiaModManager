@@ -29,7 +29,6 @@ const (
 		"Custom stories can be deleted entirely.\n" +
 		"Full conversions might leave leftovers because many of them\n" +
 		"do not properly list all of their folders and files in their config."
-	mainWorkdir = ""
 )
 
 var (
@@ -37,7 +36,7 @@ var (
 	ErrorLogger   *log.Logger
 	InfoLogger    *log.Logger
 
-	csPath          string
+	csPath          string = "custom_stories"
 	customStories   []*CustomStory
 	fullConversions []*FullConversion
 	selectedMod     Mod
@@ -57,20 +56,15 @@ func initLoggers() {
 }
 
 func main() {
-	os.Chdir("testdata") // Debug
+	// os.Chdir("testdata") // Debug
 	initLoggers()
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
 	w := a.NewWindow("Amnesia Mod Manager")
 
-	err := CheckIsRootDir(mainWorkdir)
+	err := CheckIsRootDir(".")
 	displayIfError(err, w)
 
-	if mainWorkdir == "" {
-		csPath = "custom_stories"
-	} else {
-		csPath = mainWorkdir + "/custom_stories"
-	}
 	customStories, err = GetCustomStories(csPath)
 	displayIfError(err, w)
 	fullConversions, err = GetFullConversions()
