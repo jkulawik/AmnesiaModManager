@@ -43,7 +43,7 @@ func CheckIsRootDir(dir string) error {
 
 func formatStringList(list []string) string {
 	folderList := ""
-	for _, f := range selectedMod.listFolders() {
+	for _, f := range list {
 		folderList += f + "\n"
 	}
 	return folderList
