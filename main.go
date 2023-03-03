@@ -6,6 +6,8 @@ import (
 	"image"
 	"log"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 
 	"image/jpeg"
@@ -44,6 +46,7 @@ var (
 
 	defaultImg    *canvas.Image
 	windowContent *fyne.Container
+	mainWindow    *fyne.Window
 
 	//go:embed assets/default.jpg
 	defaultImgFS embed.FS
@@ -58,7 +61,7 @@ func initLoggers() {
 }
 
 func main() {
-	os.Chdir("testdata") // Debug
+	// os.Chdir("testdata") // Debug
 	initLoggers()
 
 	defaultImgRaw, _ := defaultImgFS.Open("assets/default.jpg")
@@ -68,6 +71,7 @@ func main() {
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
 	w := a.NewWindow("Amnesia Mod Manager")
+	mainWindow = &w
 
 	err := CheckIsRootDir(".")
 	displayIfError(err, w)
@@ -347,9 +351,9 @@ func getImageFromFile(path string) *canvas.Image {
 
 func launchFullConversion() {
 	InfoLogger.Println("Launch button pressed")
-	// gameExe := execMap[runtime.GOOS]
+	gameExe := execMap[runtime.GOOS]
 
-	// cmd := exec.Command(gameExe + " prog")
-	// err := cmd.Run()
-	// displayIfError(err)
+	cmd := exec.Command(gameExe, selectedConversion.mainInitConfig)
+	err := cmd.Run()
+	displayIfError(err, *mainWindow)
 }
