@@ -43,9 +43,9 @@ var (
 
 	windowContent *fyne.Container
 
-	//go:embed default.jpg
+	//go:embed assets/default.jpg
 	defaultImgFS embed.FS
-	//go:embed icon.png
+	//go:embed assets/icon.png
 	iconBytes []byte
 )
 
@@ -56,7 +56,7 @@ func initLoggers() {
 }
 
 func main() {
-	// os.Chdir("testdata") // Debug
+	os.Chdir("testdata") // Debug
 	initLoggers()
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
@@ -125,7 +125,7 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 	defaultTitle := "Select a custom story"
 	card := widget.NewCard(defaultTitle, "", cardContentLabel)
 
-	defaultImgRaw, _ := defaultImgFS.Open("default.jpg")
+	defaultImgRaw, _ := defaultImgFS.Open("assets/default.jpg")
 	img, _ := jpeg.Decode(defaultImgRaw)
 	var defaultImg = canvas.NewImageFromImage(img)
 	//card.Image = defaultImg
@@ -244,7 +244,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	defaultTitle := "Select a full conversion"
 	card := widget.NewCard(defaultTitle, "", cardContentLabel)
 
-	defaultImgRaw, _ := defaultImgFS.Open("default.jpg")
+	defaultImgRaw, _ := defaultImgFS.Open("assets/default.jpg")
 	img, _ := jpeg.Decode(defaultImgRaw)
 	var defaultImg = canvas.NewImageFromImage(img)
 	card.Image = nil
