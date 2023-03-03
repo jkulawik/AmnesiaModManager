@@ -52,6 +52,19 @@ func TestGetLogoFromMenuConfig(t *testing.T) {
 	}
 }
 
+func TestGetLogoFromMenuConfig2(t *testing.T) {
+	logo, err := GetLogoFromMenuConfig("SomeMod/config/menu.cfg", []string{"/SomeMod"})
+	t.Logf("Logo path: %s", logo)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if logo != "SomeMod/menu_logo.tga" {
+		t.Errorf("Wrong FC logo: %s", logo)
+	}
+}
+
 func TestGetConversionFromInit(t *testing.T) {
 	path := "wn_config/main_init.cfg"
 	fc, err := GetConversionFromInit(path)
