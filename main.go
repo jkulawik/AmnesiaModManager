@@ -41,6 +41,7 @@ var (
 	fullConversions []*FullConversion
 	selectedMod     Mod
 
+	defaultImg    *canvas.Image
 	windowContent *fyne.Container
 
 	//go:embed assets/default.jpg
@@ -58,6 +59,11 @@ func initLoggers() {
 func main() {
 	os.Chdir("testdata") // Debug
 	initLoggers()
+
+	defaultImgRaw, _ := defaultImgFS.Open("assets/default.jpg")
+	img, _ := jpeg.Decode(defaultImgRaw)
+	defaultImg = canvas.NewImageFromImage(img)
+
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
 	w := a.NewWindow("Amnesia Mod Manager")
@@ -125,9 +131,6 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 	defaultTitle := "Select a custom story"
 	card := widget.NewCard(defaultTitle, "", cardContentLabel)
 
-	defaultImgRaw, _ := defaultImgFS.Open("assets/default.jpg")
-	img, _ := jpeg.Decode(defaultImgRaw)
-	var defaultImg = canvas.NewImageFromImage(img)
 	//card.Image = defaultImg
 	displayImg := defaultImg
 
@@ -244,9 +247,6 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	defaultTitle := "Select a full conversion"
 	card := widget.NewCard(defaultTitle, "", cardContentLabel)
 
-	defaultImgRaw, _ := defaultImgFS.Open("assets/default.jpg")
-	img, _ := jpeg.Decode(defaultImgRaw)
-	var defaultImg = canvas.NewImageFromImage(img)
 	card.Image = nil
 
 	launchButton := widget.NewButton("Launch", launchFullConversion)
