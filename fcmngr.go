@@ -202,7 +202,7 @@ func GetConversionFromInit(path string) (*FullConversion, error) {
 	menuPath := init.ConfigFiles.Menu
 	logo, err := GetLogoFromMenuConfig(menuPath, res)
 	if err != nil {
-		return nil, err
+		WarningLogger.Println("Error while searching for logo:", err)
 	}
 	fc.logo = logo
 
