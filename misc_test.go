@@ -30,3 +30,24 @@ func TestGetStringSpacer(t *testing.T) {
 		t.Errorf("GetStringSpacer returned incorrect string: %q (length %d)", s, len(s))
 	}
 }
+
+func TestIsModNil(t *testing.T) {
+
+	selectedMod = nil
+	x := isModNil(selectedMod)
+	if !x {
+		t.Error("Mod is nil but IsModNil returned false")
+	}
+	selectedStory = nil
+	selectedMod = selectedStory
+	x = isModNil(selectedMod)
+	if !x {
+		t.Error("Mod is type CS nil but IsModNil returned false")
+	}
+	selectedConversion = nil
+	selectedMod = selectedConversion
+	x = isModNil(selectedMod)
+	if !x {
+		t.Error("Mod is type FC nil but IsModNil returned false")
+	}
+}

@@ -62,3 +62,11 @@ func getStringSpacer(width int) string {
 	}
 	return spacer
 }
+
+func isModNil(mod Mod) bool {
+	// assigning structs which implement interfaces which are nil is not the same as assigning nil;
+	// this means that interface == nil will return false in such cases
+	csNil := (*CustomStory)(nil)
+	fcNil := (*FullConversion)(nil)
+	return mod == nil || mod == csNil || mod == fcNil
+}

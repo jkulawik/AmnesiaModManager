@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	appInfo        = "Amnesia Mod Manager v1.2.1\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+	appInfo        = "Amnesia Mod Manager v1.2.2\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
 	helpDeleteInfo = "Saves tied to mods currently do not get deleted.\n" +
 		"Custom stories can be deleted entirely.\n" +
 		"Full conversions might leave leftovers because many of them\n" +
@@ -244,8 +244,8 @@ func refreshMods(w fyne.Window) {
 }
 
 func deleteSelectedMod(w fyne.Window) {
-	if selectedMod == nil {
-		// FIXME ^doesn't work with FC
+
+	if isModNil(selectedMod) {
 		displayIfError(errors.New("no mod selected"), w)
 		return
 	}
