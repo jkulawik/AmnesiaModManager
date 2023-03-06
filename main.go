@@ -265,11 +265,8 @@ func confirmDeleteCallback(response bool) {
 	if response {
 		for _, f := range selectedMod.listFolders() {
 			err := os.RemoveAll(f)
-			if err != nil {
-				ErrorLogger.Println(err)
-			}
-
-			// TODO Refresh
+			displayIfError(err, *mainWindow)
+			refreshMods(*mainWindow)
 		}
 	}
 }
