@@ -1,6 +1,8 @@
 # AmnesiaModManager
 A simple mod manager for "Amnesia: The Dark Descent".
 
+![](/assets/screenshot_01.png)
+
 Features:
 * Browse mods
   * Custom Stories tab displays all the in-game data: title, author, description, background image, as well as the folder name that the CS is installed in
@@ -10,6 +12,8 @@ Features:
   * Deleting Full Conversions is supported, but how well it works depends on the mod set-up. Properly configured mods get deleted correctly, but messy mods might leave leftovers
 * Launch Full Conversions from one place (this currently has a bug on some Windows machines which stops the game from registering mouse clicks)
 * Theme settings - light/dark, highlight color, font size
+
+![](/assets/screenshot_02.png)
 
 This program was made mostly as practice with test-driven development and a test of the Fyne GUI package,
 but it can prove useful to people who play a lot of Amnesia mods.
