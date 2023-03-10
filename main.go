@@ -48,7 +48,7 @@ var (
 
 	defaultImg    *canvas.Image
 	windowContent *fyne.Container
-	mainWindow    *fyne.Window
+	mainWindow    fyne.Window
 
 	//go:embed assets/default.jpg
 	defaultImgFS embed.FS
@@ -106,19 +106,18 @@ func main() {
 
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
-	w := a.NewWindow("Amnesia Mod Manager")
-	mainWindow = &w
+	mainWindow := a.NewWindow("Amnesia Mod Manager")
 
 	err := CheckIsRootDir(".")
-	displayIfError(err, w)
+	displayIfError(err, mainWindow)
 
 	customStories, err = GetCustomStories(csPath)
-	displayIfError(err, w)
+	displayIfError(err, mainWindow)
 	fullConversions, err = GetFullConversions()
-	displayIfError(err, w)
+	displayIfError(err, mainWindow)
 
 	windowContent = container.NewMax()
-	toolbar := makeToolbar(w, a)
+	toolbar := makeToolbar(mainWindow, a)
 	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
 	windowContent.Refresh()
 
@@ -126,10 +125,10 @@ func main() {
 		container.NewVBox(toolbar, widget.NewSeparator()),
 		nil, nil, nil, windowContent)
 
-	w.SetContent(mainView)
+	mainWindow.SetContent(mainView)
 
-	w.Resize(fyne.NewSize(900, 480))
-	w.ShowAndRun()
+	mainWindow.Resize(fyne.NewSize(900, 480))
+	mainWindow.ShowAndRun()
 }
 
 func makeToolbar(window fyne.Window, app fyne.App) fyne.CanvasObject {
@@ -284,8 +283,8 @@ func confirmDeleteCallback(response bool) {
 	if response {
 		for _, f := range selectedMod.listFolders() {
 			err := os.RemoveAll(f)
-			displayIfError(err, *mainWindow)
-			refreshMods(*mainWindow)
+			displayIfError(err, mainWindow)
+			refreshMods(mainWindow)
 		}
 	}
 }
@@ -388,8 +387,8 @@ func launchFullConversion() {
 	gameExe := execMap[runtime.GOOS]
 
 	cmd := exec.Command(gameExe, selectedConversion.mainInitConfig)
+	// mainWindow.Hide() // TODO try if this fixes the FC issue
 	// go cmd.Run()
-	// os.Exit(0)
 	err := cmd.Run()
-	displayIfError(err, *mainWindow)
+	displayIfError(err, mainWindow)
 }
