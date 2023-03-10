@@ -26,7 +26,7 @@ import (
 
 const (
 	isTestDataBuild = false
-	appInfo         = "Amnesia Mod Manager v1.2.2\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+	appInfo         = "Amnesia Mod Manager v1.2.3\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
 	helpDeleteInfo  = "Saves tied to mods currently do not get deleted.\n" +
 		"Custom stories can be deleted entirely.\n" +
 		"Full conversions might leave leftovers because many of them\n" +
