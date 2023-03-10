@@ -4,6 +4,7 @@ import (
 	"embed"
 	"errors"
 	"image"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -25,8 +26,9 @@ import (
 )
 
 const (
-	appInfo        = "Amnesia Mod Manager v1.2.2\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
-	helpDeleteInfo = "Saves tied to mods currently do not get deleted.\n" +
+	isTestDataBuild = false
+	appInfo         = "Amnesia Mod Manager v1.2.2\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+	helpDeleteInfo  = "Saves tied to mods currently do not get deleted.\n" +
 		"Custom stories can be deleted entirely.\n" +
 		"Full conversions might leave leftovers because many of them\n" +
 		"do not properly list all of their folders and files in their config."
@@ -36,6 +38,7 @@ var (
 	WarningLogger *log.Logger
 	ErrorLogger   *log.Logger
 	InfoLogger    *log.Logger
+	logFile       *os.File
 
 	csPath             string = "custom_stories"
 	customStories      []*CustomStory
@@ -56,29 +59,48 @@ var (
 
 func initLoggers() {
 	var (
-		info       = "[INFO]    "
-		warn       = "[WARNING] "
-		err        = "[ERROR]   "
+		infoM      = "[INFO]    "
+		warnM      = "[WARNING] "
+		errM       = "[ERROR]   "
 		colorReset = "\033[0m"
 	)
 
 	if runtime.GOOS == "linux" {
-		info = "\033[36m" + info + colorReset
-		warn = "\033[33m" + warn + colorReset
-		err = "\033[31m" + err + colorReset
+		infoM = "\033[36m" + infoM + colorReset
+		warnM = "\033[33m" + warnM + colorReset
+		errM = "\033[31m" + errM + colorReset
 	}
 
-	InfoLogger = log.New(os.Stderr, info, log.Lshortfile)
-	WarningLogger = log.New(os.Stderr, warn, log.Lshortfile)
-	ErrorLogger = log.New(os.Stderr, err, log.Lshortfile)
+	writer := os.Stderr
+	InfoLogger = log.New(writer, infoM, log.Lshortfile)
+	WarningLogger = log.New(writer, warnM, log.Lshortfile)
+	ErrorLogger = log.New(writer, errM, log.Lshortfile)
 
-	// InfoLogger.Println("test")
-	// WarningLogger.Println("test")
-	// ErrorLogger.Println("test")
+	if runtime.GOOS == "windows" {
+		var err error
+		logFile, err = os.OpenFile("modmanager.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+		if err != nil {
+			ErrorLogger.Printf("error opening log file: %v", err)
+		}
+
+		mw := io.MultiWriter(os.Stderr, logFile)
+
+		InfoLogger.SetOutput(mw)
+		WarningLogger.SetOutput(mw)
+		ErrorLogger.SetOutput(mw)
+
+		newFlags := log.Ldate | log.Ltime | log.Lshortfile
+		InfoLogger.SetFlags(newFlags)
+		WarningLogger.SetFlags(newFlags)
+		ErrorLogger.SetFlags(newFlags)
+	}
 }
 
 func main() {
-	os.Chdir("testdata") // Debug
+	if isTestDataBuild {
+		os.Chdir("testdata")
+		defer logFile.Close()
+	}
 	initLoggers()
 
 	defaultImgRaw, _ := defaultImgFS.Open("assets/default.jpg")
@@ -369,6 +391,8 @@ func launchFullConversion() {
 	gameExe := execMap[runtime.GOOS]
 
 	cmd := exec.Command(gameExe, selectedConversion.mainInitConfig)
+	// go cmd.Run()
+	// os.Exit(0)
 	err := cmd.Run()
 	displayIfError(err, *mainWindow)
 }
