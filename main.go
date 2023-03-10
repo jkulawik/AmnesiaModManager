@@ -4,7 +4,6 @@ import (
 	"embed"
 	"errors"
 	"image"
-	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -83,11 +82,9 @@ func initLoggers() {
 			ErrorLogger.Printf("error opening log file: %v", err)
 		}
 
-		mw := io.MultiWriter(os.Stderr, logFile)
-
-		InfoLogger.SetOutput(mw)
-		WarningLogger.SetOutput(mw)
-		ErrorLogger.SetOutput(mw)
+		InfoLogger.SetOutput(logFile)
+		WarningLogger.SetOutput(logFile)
+		ErrorLogger.SetOutput(logFile)
 
 		newFlags := log.Ldate | log.Ltime | log.Lshortfile
 		InfoLogger.SetFlags(newFlags)
