@@ -3,9 +3,16 @@ package main
 import "encoding/xml"
 
 type Mod interface {
-	// Need basically only to allow deletion of both CS and FC mods
+	// This interface is needed basically only to allow deletion of both CS and FC mods
 	listFolders() []string
 }
+
+/*
+	About the folder string format
+	After a lengthy battle with the way that filepaths are processed by various packages,
+	the FC format was settled with no slashes at the start and end
+	(fs.WalkDir treats those as invalid).
+*/
 
 type CustomStory struct {
 	name     string
