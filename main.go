@@ -107,7 +107,7 @@ func main() {
 
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
-	mainWindow := a.NewWindow("mainTitle")
+	mainWindow = a.NewWindow(mainTitle)
 
 	err := CheckIsRootDir(".")
 	displayIfError(err, mainWindow)
@@ -283,7 +283,7 @@ func confirmDeleteCallback(response bool) {
 	if response {
 		for _, f := range selectedMod.listFolders() {
 			err := deleteModDir(f)
-			displayIfError(err, mainWindow) // FIXME: same mainWindow nil crash as with launchFullConversion
+			displayIfError(err, mainWindow)
 		}
 		refreshMods(mainWindow)
 	}
@@ -399,5 +399,5 @@ func launchFullConversion() {
 	// d.Hide()
 
 	err := cmd.Run()
-	displayIfError(err, mainWindow) // FIXME: mainwindow is nil here for some fucking reason
+	displayIfError(err, mainWindow)
 }
