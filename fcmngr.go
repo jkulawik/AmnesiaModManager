@@ -115,6 +115,12 @@ func GetUniqueResources(path string) ([]string, error) {
 
 		}
 
+		for i, entry := range resFolders {
+			if string(entry[0]) == "/" {
+				resFolders[i] = entry[1:]
+			}
+		}
+
 		return resFolders, nil
 	}
 }
@@ -178,7 +184,7 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 	// Search custom resource dirs first
 	// (same name as vanilla logo could have been used, so we can't just search from root once)
 	for _, res := range resources {
-		var searchRoot string
+		searchRoot := res
 		if string(res[0]) == "/" {
 			searchRoot = res[1:]
 		}
