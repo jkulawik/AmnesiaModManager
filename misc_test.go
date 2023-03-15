@@ -51,3 +51,5 @@ func TestIsModNil(t *testing.T) {
 		t.Error("Mod is type FC nil but IsModNil returned false")
 	}
 }
+
+// TODO test deleteFolders

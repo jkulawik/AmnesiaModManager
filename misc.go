@@ -31,7 +31,7 @@ func CheckIsRootDir(dir string) error {
 		csInDir = (csInDir || direntry.Name() == "custom_stories")
 	}
 
-	// Not checking for Amnesia binaries because their names differ between releases
+	// TODO Check for Amnesia binaries?
 
 	if !coreInDir || !entInDir {
 		return errors.New("work directory is not an Amnesia install")
@@ -69,4 +69,22 @@ func isModNil(mod Mod) bool {
 	csNil := (*CustomStory)(nil)
 	fcNil := (*FullConversion)(nil)
 	return mod == nil || mod == csNil || mod == fcNil
+}
+
+func deleteModDir(path string) error {
+	InfoLogger.Println("trying to delete:", path)
+
+	// Check if img file exists
+	if _, err := os.Stat(path); err != nil {
+		ErrorLogger.Println(err)
+		return err
+	}
+
+	lastChar := path[len(path)-1:]
+	if lastChar != "/" {
+		path += "/"
+	}
+
+	err := os.RemoveAll(path)
+	return err
 }

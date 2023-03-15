@@ -25,7 +25,8 @@ import (
 )
 
 const (
-	isTestDataBuild = false
+	isTestDataBuild = true
+	mainTitle       = "Amnesia Mod Manager"
 	appInfo         = "Amnesia Mod Manager v1.2.3\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
 	helpDeleteInfo  = "Saves tied to mods currently do not get deleted.\n" +
 		"Custom stories can be deleted entirely.\n" +
@@ -106,7 +107,7 @@ func main() {
 
 	a := app.New()
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
-	mainWindow := a.NewWindow("Amnesia Mod Manager")
+	mainWindow := a.NewWindow("mainTitle")
 
 	err := CheckIsRootDir(".")
 	displayIfError(err, mainWindow)
@@ -262,7 +263,6 @@ func refreshMods(w fyne.Window) {
 }
 
 func deleteSelectedMod(w fyne.Window) {
-
 	if isModNil(selectedMod) {
 		displayIfError(errors.New("no mod selected"), w)
 		return
@@ -282,10 +282,10 @@ func deleteSelectedMod(w fyne.Window) {
 func confirmDeleteCallback(response bool) {
 	if response {
 		for _, f := range selectedMod.listFolders() {
-			err := os.RemoveAll(f)
-			displayIfError(err, mainWindow)
-			refreshMods(mainWindow)
+			err := deleteModDir(f)
+			displayIfError(err, mainWindow) // FIXME: same mainWindow nil crash as with launchFullConversion
 		}
+		refreshMods(mainWindow)
 	}
 }
 
@@ -388,7 +388,16 @@ func launchFullConversion() {
 
 	cmd := exec.Command(gameExe, selectedConversion.mainInitConfig)
 	// mainWindow.Hide() // TODO try if this fixes the FC issue
-	// go cmd.Run()
+	go cmd.Run()
+
+	// bar := widget.NewProgressBarInfinite()
+	WarningLogger.Println("is main window nil:", mainWindow == nil)
+	// dialog.ShowCustom(mainTitle, "benu", bar, mainWindow)
+
+	// d := dialog.NewProgressInfinite(mainTitle, "aa", mainWindow)
+	// d.Show()
+	// d.Hide()
+
 	err := cmd.Run()
-	displayIfError(err, mainWindow)
+	displayIfError(err, mainWindow) // FIXME: mainwindow is nil here for some fucking reason
 }
