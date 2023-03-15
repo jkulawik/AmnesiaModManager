@@ -9,8 +9,10 @@ var TestWhiteNight = FullConversion{
 	name:            "White Night",
 	mainInitConfig:  "wn_config/main_init.cfg",
 	logo:            "wn_graphics/graphics/main_menu/wn_menu_logo.png",
-	uniqueResources: []string{"/wn_models", "/wn_sounds", "/wn_graphics", "/wn_models", "/wn_music"},
+	uniqueResources: []string{"wn_models", "wn_sounds", "wn_graphics", "wn_models", "wn_music"},
 }
+
+var someModRes = []string{"SomeMod", "SomeMod/misc"}
 
 func TestReadConversionInit(t *testing.T) {
 	fc, err := ReadConversionInit("SomeMod/config/main_init.cfg")
@@ -32,9 +34,11 @@ func TestGetUniqueResources(t *testing.T) {
 		t.Error(err)
 	}
 
-	if len(res) != 2 || res[0] != "/SomeMod" || res[1] != "/SomeMod/misc" {
-		t.Error("Parsed resource list differs from the expected one")
-		t.Log(res)
+	resString := fmt.Sprintf("%v", res)
+	testString := fmt.Sprintf("%v", someModRes)
+
+	if resString != testString {
+		t.Errorf("Parsed resource list differs expected. Original:\n%s\nGot:\n%s", testString, resString)
 	}
 
 }
