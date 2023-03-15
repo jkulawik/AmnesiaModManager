@@ -27,7 +27,7 @@ import (
 const (
 	isTestDataBuild = true
 	mainTitle       = "Amnesia Mod Manager"
-	appInfo         = "Amnesia Mod Manager v1.2.4\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+	appInfo         = "Amnesia Mod Manager v1.2.6\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
 	helpDeleteInfo  = "Saves tied to mods currently do not get deleted.\n" +
 		"Custom stories can be deleted entirely.\n" +
 		"Full conversions might leave leftovers because many of them\n" +
@@ -388,16 +388,13 @@ func launchFullConversion() {
 
 	cmd := exec.Command(gameExe, selectedConversion.mainInitConfig)
 	// mainWindow.Hide() // TODO try if this fixes the FC issue
-	go cmd.Run()
 
 	// bar := widget.NewProgressBarInfinite()
-	WarningLogger.Println("is main window nil:", mainWindow == nil)
 	// dialog.ShowCustom(mainTitle, "benu", bar, mainWindow)
-
-	// d := dialog.NewProgressInfinite(mainTitle, "aa", mainWindow)
-	// d.Show()
-	// d.Hide()
-
+	// the above  doesn't use the deprecated NewProgressInfinite, but doesn't pause app usage like desired
+	d := dialog.NewProgressInfinite(mainTitle, "Game is running...", mainWindow)
+	d.Show()
 	err := cmd.Run()
+	d.Hide()
 	displayIfError(err, mainWindow)
 }
