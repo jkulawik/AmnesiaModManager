@@ -211,7 +211,7 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 			// card.SetImage(defaultImg)
 			displayImg = defaultImg
 		} else {
-			imgFile := data[id].dir + data[id].imgFile
+			imgFile := data[id].dir + "/" + data[id].imgFile
 			displayImg = canvas.NewImageFromFile(imgFile)
 			// card.SetImage(displayImg)
 		}
