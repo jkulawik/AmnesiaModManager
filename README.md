@@ -10,7 +10,9 @@ Features:
 * Delete mods
   * Custom Stories can be deleted entirely
   * Deleting Full Conversions is supported, but how well it works depends on the mod set-up. Properly configured mods get deleted correctly, but messy mods might leave leftovers
-* Launch Full Conversions from one place (on some Windows computers using this feature has a bug with the game not registering mouse clicks)
+* Launch Full Conversions from one place
+  * Currently supported only for the Steam release (the app can only start the NoSteam version due to Steam's DRM)
+  * Warning: on some Windows computers this feature has a bug with the game not registering mouse clicks
 * Theme settings - light/dark, highlight color, font size
 
 ![](/assets/screenshot_02.png)
