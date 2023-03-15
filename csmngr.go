@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"strings"
 )
@@ -13,8 +14,10 @@ func makeStoryText(cs *CustomStory) string {
 }
 
 func ReadCustomStoryConfig(filepath string) (*CSXML, error) {
+	fileSystem := os.DirFS(".")
 
-	data, err := os.ReadFile(filepath)
+	// data, err := os.ReadFile(filepath)
+	data, err := fs.ReadFile(fileSystem, filepath)
 	if err != nil {
 		return nil, err
 	}
@@ -95,12 +98,12 @@ func makeInvalidStory(dir string) *CustomStory {
 }
 
 func GetStoryFromDir(dir string) (*CustomStory, error) {
-
-	csxml, err := ReadCustomStoryConfig(dir + "custom_story_settings.cfg")
+	csxml, err := ReadCustomStoryConfig(dir + "/custom_story_settings.cfg")
 	cs := new(CustomStory)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "custom_story_settings.cfg: no such file or directory") {
+			WarningLogger.Println(err)
 			cs = makeInvalidStory(dir)
 			return cs, nil
 		} else {
@@ -113,7 +116,8 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	cs.name = csxml.Name
 	cs.imgFile = csxml.ImgFile
 
-	if _, err := os.Stat(cs.dir + cs.imgFile); err != nil {
+	if _, err := os.Stat(cs.dir + "/" + cs.imgFile); err != nil {
+		ErrorLogger.Println(err)
 		cs.imgFile = ""
 	}
 
@@ -129,7 +133,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 		cs.langFile = "extra_english.lang"
 	}
 
-	cs.desc, err = GetDescFromLang(dir + cs.langFile)
+	cs.desc, err = GetDescFromLang(dir + "/" + cs.langFile)
 
 	if err != nil {
 		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" {
@@ -153,7 +157,7 @@ func GetCustomStories(dir string) ([]*CustomStory, error) {
 
 	for _, direntry := range filelist {
 		if direntry.IsDir() {
-			path := dir + "/" + direntry.Name() + "/"
+			path := dir + "/" + direntry.Name()
 			cs, err := GetStoryFromDir(path)
 
 			if cs != nil {

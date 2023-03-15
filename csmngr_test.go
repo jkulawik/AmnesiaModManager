@@ -9,7 +9,7 @@ var TestStoryMyMod = CustomStory{
 	"Tutorial",
 	"Mudbill",
 	"new_story.lang",
-	"custom_stories/MyMod/",
+	"custom_stories/MyMod",
 	"Error while parsing lang file XML.",
 	"customstory.png",
 }
@@ -18,7 +18,7 @@ var TestStoryEscape = CustomStory{
 	"Another Madhouse mod",
 	"Sabatu",
 	"extra_english.lang",
-	"custom_stories/_ESCAPE/",
+	"custom_stories/_ESCAPE",
 	"Another epic plot about people getting Amnesia",
 	"yellow.jpg",
 }
@@ -27,7 +27,7 @@ var TestStoryBad = CustomStory{
 	"Mod with no image",
 	"Cmon",
 	"extra_english.lang",
-	"custom_stories/BadMod/",
+	"custom_stories/BadMod",
 	"I don't know how you can miss the damn image.",
 	"",
 }
@@ -67,37 +67,43 @@ func TestGetDescFromLang(t *testing.T) {
 }
 
 func TestGetStoryFromDir(t *testing.T) {
-	cs, err := GetStoryFromDir("custom_stories/MyMod/")
+	cs, err := GetStoryFromDir("custom_stories/MyMod")
 
 	if err != nil && !strings.Contains(err.Error(), "invalid sequence \"--\" not allowed in comments") {
 		t.Error(err)
 	}
 
-	if *cs != TestStoryMyMod {
+	if cs == nil {
+		t.Errorf("Received nil mod pointer")
+	} else if *cs != TestStoryMyMod {
 		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryMyMod)
 	}
 }
 
 func TestGetStoryFromDir2(t *testing.T) {
-	cs, err := GetStoryFromDir("custom_stories/_ESCAPE/")
+	cs, err := GetStoryFromDir("custom_stories/_ESCAPE")
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if *cs != TestStoryEscape {
+	if cs == nil {
+		t.Errorf("Received nil mod pointer")
+	} else if *cs != TestStoryEscape {
 		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryEscape)
 	}
 }
 
 func TestGetStoryNoImg(t *testing.T) {
-	cs, err := GetStoryFromDir("custom_stories/BadMod/")
+	cs, err := GetStoryFromDir("custom_stories/BadMod")
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if *cs != TestStoryBad {
+	if cs == nil {
+		t.Errorf("Received nil mod pointer")
+	} else if *cs != TestStoryBad {
 		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryBad)
 	}
 }
