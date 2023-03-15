@@ -118,7 +118,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 
 	// Check if img file exists
 	if _, err := os.Stat(cs.dir + "/" + cs.imgFile); err != nil {
-		ErrorLogger.Println(err)
+		WarningLogger.Println(err)
 		cs.imgFile = ""
 	}
 
