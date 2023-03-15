@@ -80,6 +80,7 @@ func deleteModDir(path string) error {
 		return err
 	}
 
+	// There should be no trailing slashes anywhere and we need to add one for the deletion to succeed
 	lastChar := path[len(path)-1:]
 	if lastChar != "/" {
 		path += "/"
