@@ -27,6 +27,6 @@ This is mostly due to the fact that Go is a language rarely used on desktops; yo
 
 # Usage
 
-Get the program for your system from the releases section and place it in your Amnesia install folder (next to Amnesia.exe). 
+Get the program (modmanger.exe) for your system from the releases section and place it in your Amnesia install folder (next to Amnesia.exe). 
 
 If you have Go installed, you can also compile it yourself by running `go build .` in the project folder.
