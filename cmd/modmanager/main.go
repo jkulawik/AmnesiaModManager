@@ -225,9 +225,9 @@ func deleteSelectedMod(w fyne.Window) {
 		return
 	}
 
-	folderList := formatStringList(selectedMod.listFolders())
+	folderList := strings.Join(selectedMod.listFolders(), "\n")
 
-	warningMessage := "Delete the following folders?\n\n" + folderList
+	warningMessage := "Delete the following folders?\n\n" + folderList + "\n"
 	warningMessage += "\nAll files will be deleted permanently.\n\nMod saves will not be deleted."
 
 	cnf := dialog.NewConfirm("Confirmation", warningMessage, confirmDeleteCallback, w)
@@ -296,7 +296,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 			card.SetTitle(data[id].name)
 		} else {
 			card.SetTitle(data[id].name) // TODO we have the logo, no need to clutter the space further?
-			// card.SetSubTitle(getStringSpacer(90)) // to not let the card shrink too much
+			// card.SetSubTitle(strings.Repeat(" ", 90)) // to not let the card shrink too much
 			// card.SetSubTitle("")
 
 			displayImg := getImageFromFile(data[id].logo)
@@ -341,6 +341,11 @@ func getImageFromFile(path string) *canvas.Image {
 
 func launchFullConversion() {
 	logger.Info.Println("Launch button pressed")
+
+	var execMap = map[string]string{
+		"windows": ".\\Amnesia_NoSteam.exe",
+		"linux":   "./Amnesia_NOSTEAM.bin.x86_64",
+	}
 	gameExe := execMap[runtime.GOOS]
 
 	cmd := exec.Command(gameExe, selectedConversion.mainInitConfig)

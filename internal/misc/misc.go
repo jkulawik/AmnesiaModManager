@@ -8,11 +8,6 @@ import (
 	"modmanager/internal/mods"
 )
 
-var execMap = map[string]string{
-	"windows": ".\\Amnesia_NoSteam.exe",
-	"linux":   "./Amnesia_NOSTEAM.bin.x86_64",
-}
-
 func CheckIsRootDir(dir string) error {
 	if dir == "" {
 		dir = "."
@@ -49,23 +44,7 @@ func CheckIsRootDir(dir string) error {
 	return errors.New("unknown issue with the work directory") // func should never reach here but static analysis complains about not returning
 }
 
-func formatStringList(list []string) string {
-	folderList := ""
-	for _, f := range list {
-		folderList += f + "\n"
-	}
-	return folderList
-}
-
-// For FC display card - stops it from shrinking
-func getStringSpacer(width int) string {
-	spacer := ""
-	for i := 0; i < width; i++ {
-		spacer += " "
-	}
-	return spacer
-}
-
+// TODO get rid of this
 func isModNil(mod mods.Mod) bool {
 	// assigning structs which implement interfaces which are nil is not the same as assigning nil;
 	// this means that interface == nil will return false in such cases
