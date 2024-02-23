@@ -1,6 +1,7 @@
-package main
+package misc
 
 import (
+	"modmanager/internal/mods"
 	"testing"
 )
 
@@ -33,18 +34,21 @@ func TestGetStringSpacer(t *testing.T) {
 
 func TestIsModNil(t *testing.T) {
 
-	selectedMod = nil
+	var selectedMod mods.Mod
+	// selectedMod = nil
 	x := isModNil(selectedMod)
 	if !x {
 		t.Error("Mod is nil but IsModNil returned false")
 	}
-	selectedStory = nil
+	var selectedStory *mods.CustomStory
+	// selectedStory = nil
 	selectedMod = selectedStory
 	x = isModNil(selectedMod)
 	if !x {
 		t.Error("Mod is type CS nil but IsModNil returned false")
 	}
-	selectedConversion = nil
+	var selectedConversion *mods.FullConversion
+	// selectedConversion = nil
 	selectedMod = selectedConversion
 	x = isModNil(selectedMod)
 	if !x {

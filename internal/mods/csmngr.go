@@ -1,4 +1,4 @@
-package main
+package mods
 
 import (
 	"encoding/xml"
@@ -7,13 +7,16 @@ import (
 	"io/fs"
 	"os"
 	"strings"
+
+	"modmanager/internal/configs"
+	"modmanager/internal/logger"
 )
 
-func makeStoryText(cs *CustomStory) string {
+func MakeStoryText(cs *CustomStory) string {
 	return fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.dir, cs.desc)
 }
 
-func ReadCustomStoryConfig(filepath string) (*CSXML, error) {
+func ReadCustomStoryConfig(filepath string) (*configs.CSXML, error) {
 	fileSystem := os.DirFS(".")
 
 	// data, err := os.ReadFile(filepath)
@@ -22,8 +25,8 @@ func ReadCustomStoryConfig(filepath string) (*CSXML, error) {
 		return nil, err
 	}
 
-	csxml := new(CSXML)
-	empty := new(CSXML)
+	csxml := new(configs.CSXML)
+	empty := new(configs.CSXML)
 	err = xml.Unmarshal(data, csxml)
 
 	if *csxml == *empty {
@@ -44,7 +47,7 @@ func GetDescFromLang(filepath string) (string, error) {
 		return "Lang file not found", err
 	}
 
-	langxml := new(LangXML)
+	langxml := new(configs.LangXML)
 	err = xml.Unmarshal(data, langxml)
 	// t.Log(langxml)
 
@@ -53,7 +56,7 @@ func GetDescFromLang(filepath string) (string, error) {
 	}
 
 	// Search categories
-	var categoryCustomStoryMain LangXMLCategory
+	var categoryCustomStoryMain configs.LangXMLCategory
 	isMainCategoryInLang := false
 
 	for _, cat := range langxml.Categories {
@@ -69,7 +72,7 @@ func GetDescFromLang(filepath string) (string, error) {
 	//t.Log(categoryCustomStoryMain)
 
 	// Search category for entry
-	var entryCustomStoryDesc LangXMLEntry
+	var entryCustomStoryDesc configs.LangXMLEntry
 	isDescInCategory := false
 
 	for _, entry := range categoryCustomStoryMain.Entries {
@@ -103,7 +106,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 
 	if err != nil {
 		if strings.Contains(err.Error(), "custom_story_settings.cfg: no such file or directory") {
-			WarningLogger.Println(err)
+			logger.Warn.Println(err)
 			cs = makeInvalidStory(dir)
 			return cs, nil
 		} else {
@@ -118,7 +121,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 
 	// Check if img file exists
 	if _, err := os.Stat(cs.dir + "/" + cs.imgFile); err != nil {
-		WarningLogger.Println(err)
+		logger.Warn.Println(err)
 		cs.imgFile = ""
 	}
 
@@ -138,10 +141,10 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 
 	if err != nil {
 		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" {
-			WarningLogger.Println(cs.dir, err)
+			logger.Warn.Println(cs.dir, err)
 			return cs, nil
 		} else {
-			ErrorLogger.Println(cs.dir, err)
+			logger.Error.Println(cs.dir, err)
 			return cs, err
 		}
 	}
@@ -165,7 +168,7 @@ func GetCustomStories(dir string) ([]*CustomStory, error) {
 				csList = append(csList, cs)
 			}
 			if err != nil {
-				ErrorLogger.Println(err)
+				logger.Error.Println(err)
 				// Can't return nil due to an error because finding one doesn't mean the entire list is invalid
 			}
 		}

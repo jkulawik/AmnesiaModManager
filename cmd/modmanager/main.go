@@ -4,7 +4,6 @@ import (
 	"embed"
 	"errors"
 	"image"
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -22,6 +21,9 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/ftrvxmtrx/tga"
+
+	"modmanager/internal/logger"
+	"modmanager/internal/mods"
 )
 
 const (
@@ -35,72 +37,27 @@ const (
 )
 
 var (
-	WarningLogger *log.Logger
-	ErrorLogger   *log.Logger
-	InfoLogger    *log.Logger
-	logFile       *os.File
-
 	csPath             string = "custom_stories"
-	customStories      []*CustomStory
-	fullConversions    []*FullConversion
-	selectedStory      *CustomStory
-	selectedConversion *FullConversion
-	selectedMod        Mod
+	customStories      []*mods.CustomStory
+	fullConversions    []*mods.FullConversion
+	selectedStory      *mods.CustomStory
+	selectedConversion *mods.FullConversion
+	selectedMod        mods.Mod
 
 	defaultImg    *canvas.Image
 	windowContent *fyne.Container
 	mainWindow    fyne.Window
 
-	//go:embed assets/default.jpg
+	//go:embed default.jpg
 	defaultImgFS embed.FS
-	//go:embed assets/icon.png
+	//go:embed icon.png
 	iconBytes []byte
 )
-
-func initLoggers() {
-	var (
-		infoM      = "[INFO]    "
-		warnM      = "[WARNING] "
-		errM       = "[ERROR]   "
-		colorReset = "\033[0m"
-	)
-
-	if runtime.GOOS == "linux" {
-		infoM = "\033[36m" + infoM + colorReset
-		warnM = "\033[33m" + warnM + colorReset
-		errM = "\033[31m" + errM + colorReset
-	}
-
-	writer := os.Stderr
-	InfoLogger = log.New(writer, infoM, log.Lshortfile)
-	WarningLogger = log.New(writer, warnM, log.Lshortfile)
-	ErrorLogger = log.New(writer, errM, log.Lshortfile)
-
-	if runtime.GOOS == "windows" {
-		var err error
-		logFile, err = os.OpenFile("modmanager.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
-		if err != nil {
-			ErrorLogger.Printf("error opening log file: %v", err)
-		}
-
-		InfoLogger.SetOutput(logFile)
-		WarningLogger.SetOutput(logFile)
-		ErrorLogger.SetOutput(logFile)
-
-		newFlags := log.Ldate | log.Ltime | log.Lshortfile
-		InfoLogger.SetFlags(newFlags)
-		WarningLogger.SetFlags(newFlags)
-		ErrorLogger.SetFlags(newFlags)
-	}
-}
 
 func main() {
 	if isTestDataBuild {
 		os.Chdir("testdata")
-		defer logFile.Close()
 	}
-	initLoggers()
-
 	defaultImgRaw, _ := defaultImgFS.Open("assets/default.jpg")
 	img, _ := jpeg.Decode(defaultImgRaw)
 	defaultImg = canvas.NewImageFromImage(img)
@@ -205,7 +162,7 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 		selectedMod = selectedStory
 		card.SetTitle(data[id].name)
 		card.SetSubTitle("Author: " + data[id].author)
-		cardContentLabel.SetText(makeStoryText(data[id]))
+		cardContentLabel.SetText(mods.MakeStoryText(data[id]))
 
 		if data[id].imgFile == "" {
 			// card.SetImage(defaultImg)
@@ -234,7 +191,7 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 
 func displayIfError(err error, w fyne.Window) {
 	if err != nil {
-		ErrorLogger.Println(err)
+		logger.Error.Println(err)
 		dialog.ShowError(err, w)
 	}
 }
@@ -326,7 +283,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		selectedConversion = data[id]
 		selectedMod = selectedConversion
 		// card.SetSubTitle("Author: " + data[id].author)
-		// cardContentLabel.SetText(makeStoryText(data[id]))
+		// cardContentLabel.SetText(mods.MakeStoryText(data[id]))
 		// cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
 		// folderString := formatStringList(data[id].uniqueResources)
 		// cardContentLabel.SetText("Mod folder(s):\n" + folderString)
@@ -364,11 +321,11 @@ func makeFullConversionListTab() fyne.CanvasObject {
 func loadTGA(path string) image.Image {
 	imgRaw, err := os.Open(path)
 	if err != nil {
-		ErrorLogger.Println(err)
+		logger.Error.Println(err)
 	}
 	img, err := tga.Decode(imgRaw)
 	if err != nil {
-		ErrorLogger.Println(err)
+		logger.Error.Println(err)
 	}
 	return img
 }
@@ -383,7 +340,7 @@ func getImageFromFile(path string) *canvas.Image {
 }
 
 func launchFullConversion() {
-	InfoLogger.Println("Launch button pressed")
+	logger.Info.Println("Launch button pressed")
 	gameExe := execMap[runtime.GOOS]
 
 	cmd := exec.Command(gameExe, selectedConversion.mainInitConfig)

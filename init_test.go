@@ -3,6 +3,5 @@ package main
 import "os"
 
 func init() {
-	initLoggers()
-	os.Chdir("testdata")
+	os.Chdir("testdata") // FIXME this was a lazy workaround, replace with proper fixture usage
 }

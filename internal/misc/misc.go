@@ -1,8 +1,11 @@
-package main
+package misc
 
 import (
 	"errors"
 	"os"
+
+	"modmanager/internal/logger"
+	"modmanager/internal/mods"
 )
 
 var execMap = map[string]string{
@@ -63,20 +66,20 @@ func getStringSpacer(width int) string {
 	return spacer
 }
 
-func isModNil(mod Mod) bool {
+func isModNil(mod mods.Mod) bool {
 	// assigning structs which implement interfaces which are nil is not the same as assigning nil;
 	// this means that interface == nil will return false in such cases
-	csNil := (*CustomStory)(nil)
-	fcNil := (*FullConversion)(nil)
+	csNil := (*mods.CustomStory)(nil)
+	fcNil := (*mods.FullConversion)(nil)
 	return mod == nil || mod == csNil || mod == fcNil
 }
 
 func deleteModDir(path string) error {
-	InfoLogger.Println("trying to delete:", path)
+	logger.Info.Println("trying to delete:", path)
 
 	// Check if img file exists
 	if _, err := os.Stat(path); err != nil {
-		ErrorLogger.Println(err)
+		logger.Error.Println(err)
 		return err
 	}
 

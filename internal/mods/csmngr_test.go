@@ -1,4 +1,4 @@
-package main
+package mods
 
 import (
 	"strings"
@@ -33,7 +33,6 @@ var TestStoryBad = CustomStory{
 }
 
 func TestReadCustomStoryConfig(t *testing.T) {
-
 	csxml, err := ReadCustomStoryConfig("custom_stories/MyMod/custom_story_settings.cfg")
 	t.Log(*csxml)
 
