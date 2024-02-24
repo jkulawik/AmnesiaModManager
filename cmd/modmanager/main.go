@@ -10,6 +10,10 @@ import (
 	"runtime"
 	"strings"
 
+	// the _ means to import a package purely for its initialization side effects;
+	// in this case png has to be registered, otherwise it causes errors about pngs being tga for some god forsaken reason
+	_ "image/png"
+
 	"github.com/ftrvxmtrx/tga"
 
 	"fyne.io/fyne/v2"
@@ -61,7 +65,7 @@ func main() {
 	defaultImg = canvas.NewImageFromImage(img)
 
 	a := app.New()
-	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
+	a.SetIcon(fyne.NewStaticResource("icon.png", iconBytes))
 	mainWindow = a.NewWindow(mainTitle)
 
 	err := mods.CheckIsRootDir(".")
@@ -287,7 +291,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		// cardContentLabel.SetText("Mod folder(s):\n" + folderString)
 		launchButton.Show()
 
-		// InfoLogger.Println("Logo for", data[id].name, "is", data[id].Logo)
+		// logger.Info.Println(data[id].Name, "logo:", data[id].Logo)
 
 		if data[id].Logo == "" {
 			card.SetImage(nil)
@@ -317,6 +321,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 }
 
 func loadTGA(path string) image.Image {
+	// TODO This should return errors
 	imgRaw, err := os.Open(path)
 	if err != nil {
 		logger.Error.Println(err)
@@ -329,6 +334,7 @@ func loadTGA(path string) image.Image {
 }
 
 func getImageFromFile(path string) *canvas.Image {
+	// TODO this should handle and return errors
 	if strings.Contains(path, ".tga") {
 		img := loadTGA(path)
 		return canvas.NewImageFromImage(img)
