@@ -21,29 +21,27 @@ func ReadCustomStoryConfig(filepath string) (*configs.CSXML, error) {
 	// data, err := os.ReadFile(filepath)
 	data, err := fs.ReadFile(fileSystem, filepath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ReadCustomStoryConfig: %w", err)
 	}
 
 	csxml := new(configs.CSXML)
-	empty := new(configs.CSXML)
+	// empty := new(configs.CSXML)
 	err = xml.Unmarshal(data, csxml)
 
-	if *csxml == *empty {
-		return nil, errors.New(filepath + ": XML parser returned an empty object") // TODO wrap error
-	}
+	// if *csxml == *empty {
+	// }
 
 	if err != nil {
-		return nil, err
-	} else {
-		return csxml, nil
+		return nil, fmt.Errorf("ReadCustomStoryConfig: XML parser encountered an error: %w", err)
 	}
+	return csxml, nil
 }
 
 func GetDescFromLang(filepath string) (string, error) {
 
 	data, err := os.ReadFile(filepath)
 	if err != nil {
-		return "Lang file not found", err
+		return "Lang file not found", fmt.Errorf("GetDescFromLang: %w", err)
 	}
 
 	langxml := new(configs.LangXML)
@@ -51,7 +49,7 @@ func GetDescFromLang(filepath string) (string, error) {
 	// t.Log(langxml)
 
 	if err != nil {
-		return "Error while parsing lang file XML.", err
+		return "Error while parsing lang file XML.", fmt.Errorf("GetDescFromLang: %w", err)
 	}
 
 	// Search categories
@@ -109,7 +107,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 			cs = makeInvalidStory(dir)
 			return cs, nil
 		} else {
-			return nil, err
+			return nil, fmt.Errorf("GetStoryFromDir: %w", err)
 		}
 	}
 
@@ -143,8 +141,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 			logger.Warn.Println(cs.Dir, err)
 			return cs, nil
 		} else {
-			logger.Error.Println(cs.Dir, err)
-			return cs, err
+			return cs, fmt.Errorf("GetStoryFromDir: %w", err)
 		}
 	}
 
@@ -154,7 +151,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 func GetCustomStories(dir string) ([]*CustomStory, error) {
 	filelist, err := os.ReadDir(dir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetCustomStories: %w", err)
 	}
 	csList := make([]*CustomStory, 0, len(filelist))
 
@@ -167,7 +164,7 @@ func GetCustomStories(dir string) ([]*CustomStory, error) {
 				csList = append(csList, cs)
 			}
 			if err != nil {
-				logger.Error.Println(err)
+				logger.Error.Println("GetCustomStories: ", err)
 				// Can't return nil due to an error because finding one doesn't mean the entire list is invalid
 			}
 		}
