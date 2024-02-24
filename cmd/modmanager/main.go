@@ -4,13 +4,13 @@ import (
 	"embed"
 	"errors"
 	"image"
-	"log"
+	"image/jpeg"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 
-	"image/jpeg"
+	"github.com/ftrvxmtrx/tga"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -21,87 +21,42 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"github.com/ftrvxmtrx/tga"
+
+	"modmanager/internal/logger"
+	"modmanager/internal/mods"
 )
 
 const (
-	isTestDataBuild = true
-	mainTitle       = "Amnesia Mod Manager"
-	appInfo         = "Amnesia Mod Manager v1.2.6\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
-	helpDeleteInfo  = "Saves tied to mods currently do not get deleted.\n" +
+	mainTitle      = "Amnesia Mod Manager"
+	appInfo        = "Amnesia Mod Manager v1.3.0\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+	helpDeleteInfo = "Saves tied to mods currently do not get deleted.\n" +
 		"Custom stories can be deleted entirely.\n" +
 		"Full conversions might leave leftovers because many of them\n" +
 		"do not properly list all of their folders and files in their config."
+
+	isTestDataBuild = true
+	csPath          = "custom_stories"
 )
 
 var (
-	WarningLogger *log.Logger
-	ErrorLogger   *log.Logger
-	InfoLogger    *log.Logger
-	logFile       *os.File
-
-	csPath             string = "custom_stories"
-	customStories      []*CustomStory
-	fullConversions    []*FullConversion
-	selectedStory      *CustomStory
-	selectedConversion *FullConversion
-	selectedMod        Mod
+	customStories      []*mods.CustomStory
+	fullConversions    []*mods.FullConversion
+	selectedStory      *mods.CustomStory
+	selectedConversion *mods.FullConversion
+	selectedMod        mods.Mod
 
 	defaultImg    *canvas.Image
 	windowContent *fyne.Container
 	mainWindow    fyne.Window
 
-	//go:embed assets/default.jpg
+	//go:embed default.jpg
 	defaultImgFS embed.FS
-	//go:embed assets/icon.png
+	//go:embed icon.png
 	iconBytes []byte
 )
 
-func initLoggers() {
-	var (
-		infoM      = "[INFO]    "
-		warnM      = "[WARNING] "
-		errM       = "[ERROR]   "
-		colorReset = "\033[0m"
-	)
-
-	if runtime.GOOS == "linux" {
-		infoM = "\033[36m" + infoM + colorReset
-		warnM = "\033[33m" + warnM + colorReset
-		errM = "\033[31m" + errM + colorReset
-	}
-
-	writer := os.Stderr
-	InfoLogger = log.New(writer, infoM, log.Lshortfile)
-	WarningLogger = log.New(writer, warnM, log.Lshortfile)
-	ErrorLogger = log.New(writer, errM, log.Lshortfile)
-
-	if runtime.GOOS == "windows" {
-		var err error
-		logFile, err = os.OpenFile("modmanager.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
-		if err != nil {
-			ErrorLogger.Printf("error opening log file: %v", err)
-		}
-
-		InfoLogger.SetOutput(logFile)
-		WarningLogger.SetOutput(logFile)
-		ErrorLogger.SetOutput(logFile)
-
-		newFlags := log.Ldate | log.Ltime | log.Lshortfile
-		InfoLogger.SetFlags(newFlags)
-		WarningLogger.SetFlags(newFlags)
-		ErrorLogger.SetFlags(newFlags)
-	}
-}
-
 func main() {
-	if isTestDataBuild {
-		os.Chdir("testdata")
-		defer logFile.Close()
-	}
-	initLoggers()
-
-	defaultImgRaw, _ := defaultImgFS.Open("assets/default.jpg")
+	defaultImgRaw, _ := defaultImgFS.Open("default.jpg")
 	img, _ := jpeg.Decode(defaultImgRaw)
 	defaultImg = canvas.NewImageFromImage(img)
 
@@ -109,12 +64,12 @@ func main() {
 	a.SetIcon(fyne.NewStaticResource("amm_icon", iconBytes))
 	mainWindow = a.NewWindow(mainTitle)
 
-	err := CheckIsRootDir(".")
+	err := mods.CheckIsRootDir(".")
 	displayIfError(err, mainWindow)
 
-	customStories, err = GetCustomStories(csPath)
+	customStories, err = mods.GetCustomStories(csPath)
 	displayIfError(err, mainWindow)
-	fullConversions, err = GetFullConversions()
+	fullConversions, err = mods.GetFullConversions(".")
 	displayIfError(err, mainWindow)
 
 	windowContent = container.NewMax()
@@ -197,21 +152,21 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 			return container.New(layout.NewHBoxLayout(), widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
-			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id].name)
+			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id].Name)
 		},
 	)
 	list.OnSelected = func(id widget.ListItemID) {
 		selectedStory = data[id]
 		selectedMod = selectedStory
-		card.SetTitle(data[id].name)
-		card.SetSubTitle("Author: " + data[id].author)
-		cardContentLabel.SetText(makeStoryText(data[id]))
+		card.SetTitle(data[id].Name)
+		card.SetSubTitle("Author: " + data[id].Author)
+		cardContentLabel.SetText(mods.MakeStoryText(data[id]))
 
-		if data[id].imgFile == "" {
+		if data[id].ImgFile == "" {
 			// card.SetImage(defaultImg)
 			displayImg = defaultImg
 		} else {
-			imgFile := data[id].dir + "/" + data[id].imgFile
+			imgFile := data[id].Dir + "/" + data[id].ImgFile
 			displayImg = canvas.NewImageFromFile(imgFile)
 			// card.SetImage(displayImg)
 		}
@@ -234,7 +189,7 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 
 func displayIfError(err error, w fyne.Window) {
 	if err != nil {
-		ErrorLogger.Println(err)
+		logger.Error.Println(err)
 		dialog.ShowError(err, w)
 	}
 }
@@ -253,9 +208,9 @@ func refreshMods(w fyne.Window) {
 	selectedStory = nil
 	selectedMod = nil
 
-	customStories, err = GetCustomStories(csPath)
+	customStories, err = mods.GetCustomStories(csPath)
 	displayIfError(err, w)
-	fullConversions, err = GetFullConversions()
+	fullConversions, err = mods.GetFullConversions(".")
 	displayIfError(err, w)
 
 	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
@@ -263,14 +218,14 @@ func refreshMods(w fyne.Window) {
 }
 
 func deleteSelectedMod(w fyne.Window) {
-	if isModNil(selectedMod) {
+	if mods.IsModNil(selectedMod) {
 		displayIfError(errors.New("no mod selected"), w)
 		return
 	}
 
-	folderList := formatStringList(selectedMod.listFolders())
+	folderList := strings.Join(selectedMod.ListFolders(), "\n")
 
-	warningMessage := "Delete the following folders?\n\n" + folderList
+	warningMessage := "Delete the following folders?\n\n" + folderList + "\n"
 	warningMessage += "\nAll files will be deleted permanently.\n\nMod saves will not be deleted."
 
 	cnf := dialog.NewConfirm("Confirmation", warningMessage, confirmDeleteCallback, w)
@@ -281,8 +236,8 @@ func deleteSelectedMod(w fyne.Window) {
 
 func confirmDeleteCallback(response bool) {
 	if response {
-		for _, f := range selectedMod.listFolders() {
-			err := deleteModDir(f)
+		for _, f := range selectedMod.ListFolders() {
+			err := mods.DeleteModDir(f)
 			displayIfError(err, mainWindow)
 		}
 		refreshMods(mainWindow)
@@ -319,30 +274,30 @@ func makeFullConversionListTab() fyne.CanvasObject {
 			return container.New(layout.NewHBoxLayout(), widget.NewIcon(theme.FileApplicationIcon()), widget.NewLabel("Template Object"))
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
-			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id].name)
+			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id].Name)
 		},
 	)
 	list.OnSelected = func(id widget.ListItemID) {
 		selectedConversion = data[id]
 		selectedMod = selectedConversion
 		// card.SetSubTitle("Author: " + data[id].author)
-		// cardContentLabel.SetText(makeStoryText(data[id]))
+		// cardContentLabel.SetText(mods.MakeStoryText(data[id]))
 		// cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
 		// folderString := formatStringList(data[id].uniqueResources)
 		// cardContentLabel.SetText("Mod folder(s):\n" + folderString)
 		launchButton.Show()
 
-		// InfoLogger.Println("Logo for", data[id].name, "is", data[id].logo)
+		// InfoLogger.Println("Logo for", data[id].name, "is", data[id].Logo)
 
-		if data[id].logo == "" {
+		if data[id].Logo == "" {
 			card.SetImage(nil)
-			card.SetTitle(data[id].name)
+			card.SetTitle(data[id].Name)
 		} else {
-			card.SetTitle(data[id].name) // TODO we have the logo, no need to clutter the space further?
-			// card.SetSubTitle(getStringSpacer(90)) // to not let the card shrink too much
+			card.SetTitle(data[id].Name) // TODO we have the logo, no need to clutter the space further?
+			// card.SetSubTitle(strings.Repeat(" ", 90)) // to not let the card shrink too much
 			// card.SetSubTitle("")
 
-			displayImg := getImageFromFile(data[id].logo)
+			displayImg := getImageFromFile(data[id].Logo)
 			displayImg.FillMode = canvas.ImageFillOriginal
 			card.SetImage(displayImg)
 		}
@@ -364,11 +319,11 @@ func makeFullConversionListTab() fyne.CanvasObject {
 func loadTGA(path string) image.Image {
 	imgRaw, err := os.Open(path)
 	if err != nil {
-		ErrorLogger.Println(err)
+		logger.Error.Println(err)
 	}
 	img, err := tga.Decode(imgRaw)
 	if err != nil {
-		ErrorLogger.Println(err)
+		logger.Error.Println(err)
 	}
 	return img
 }
@@ -383,10 +338,15 @@ func getImageFromFile(path string) *canvas.Image {
 }
 
 func launchFullConversion() {
-	InfoLogger.Println("Launch button pressed")
+	logger.Info.Println("Launch button pressed")
+
+	var execMap = map[string]string{
+		"windows": ".\\Amnesia_NoSteam.exe",
+		"linux":   "./Amnesia_NOSTEAM.bin.x86_64",
+	}
 	gameExe := execMap[runtime.GOOS]
 
-	cmd := exec.Command(gameExe, selectedConversion.mainInitConfig)
+	cmd := exec.Command(gameExe, selectedConversion.MainInitConfig)
 	// mainWindow.Hide() // TODO try if this fixes the FC issue
 
 	// bar := widget.NewProgressBarInfinite()

@@ -1,45 +1,45 @@
-package main
+package mods
 
 import (
 	"strings"
 	"testing"
 )
 
-var TestStoryMyMod = CustomStory{
+var testStoryMyMod = CustomStory{
 	"Tutorial",
 	"Mudbill",
 	"new_story.lang",
-	"custom_stories/MyMod",
+	"testdata/custom_stories/MyMod",
 	"Error while parsing lang file XML.",
 	"customstory.png",
 }
 
-var TestStoryEscape = CustomStory{
+var testStoryEscape = CustomStory{
 	"Another Madhouse mod",
 	"Sabatu",
 	"extra_english.lang",
-	"custom_stories/_ESCAPE",
+	"testdata/custom_stories/_ESCAPE",
 	"Another epic plot about people getting Amnesia",
 	"yellow.jpg",
 }
 
-var TestStoryBad = CustomStory{
+var testStoryBad = CustomStory{
 	"Mod with no image",
 	"Cmon",
 	"extra_english.lang",
-	"custom_stories/BadMod",
+	"testdata/custom_stories/BadMod",
 	"I don't know how you can miss the damn image.",
 	"",
 }
 
 func TestReadCustomStoryConfig(t *testing.T) {
-
-	csxml, err := ReadCustomStoryConfig("custom_stories/MyMod/custom_story_settings.cfg")
-	t.Log(*csxml)
+	csxml, err := ReadCustomStoryConfig("testdata/custom_stories/MyMod/custom_story_settings.cfg")
 
 	if err != nil {
 		t.Error(err)
+		return
 	}
+	t.Log(*csxml)
 
 	if csxml.Author != "Mudbill" {
 		t.Errorf("wrong Author parameter: %s instead of Mudbill", csxml.Author)
@@ -55,7 +55,7 @@ func TestReadCustomStoryConfig(t *testing.T) {
 
 func TestGetDescFromLang(t *testing.T) {
 
-	desc, err := GetDescFromLang("custom_stories/_ESCAPE/extra_english.lang")
+	desc, err := GetDescFromLang("testdata/custom_stories/_ESCAPE/extra_english.lang")
 
 	if err != nil {
 		t.Error(err)
@@ -67,7 +67,7 @@ func TestGetDescFromLang(t *testing.T) {
 }
 
 func TestGetStoryFromDir(t *testing.T) {
-	cs, err := GetStoryFromDir("custom_stories/MyMod")
+	cs, err := GetStoryFromDir("testdata/custom_stories/MyMod")
 
 	if err != nil && !strings.Contains(err.Error(), "invalid sequence \"--\" not allowed in comments") {
 		t.Error(err)
@@ -75,13 +75,13 @@ func TestGetStoryFromDir(t *testing.T) {
 
 	if cs == nil {
 		t.Errorf("Received nil mod pointer")
-	} else if *cs != TestStoryMyMod {
-		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryMyMod)
+	} else if *cs != testStoryMyMod {
+		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, testStoryMyMod)
 	}
 }
 
 func TestGetStoryFromDir2(t *testing.T) {
-	cs, err := GetStoryFromDir("custom_stories/_ESCAPE")
+	cs, err := GetStoryFromDir("testdata/custom_stories/_ESCAPE")
 
 	if err != nil {
 		t.Error(err)
@@ -89,13 +89,13 @@ func TestGetStoryFromDir2(t *testing.T) {
 
 	if cs == nil {
 		t.Errorf("Received nil mod pointer")
-	} else if *cs != TestStoryEscape {
-		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryEscape)
+	} else if *cs != testStoryEscape {
+		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, testStoryEscape)
 	}
 }
 
 func TestGetStoryNoImg(t *testing.T) {
-	cs, err := GetStoryFromDir("custom_stories/BadMod")
+	cs, err := GetStoryFromDir("testdata/custom_stories/BadMod")
 
 	if err != nil {
 		t.Error(err)
@@ -103,14 +103,14 @@ func TestGetStoryNoImg(t *testing.T) {
 
 	if cs == nil {
 		t.Errorf("Received nil mod pointer")
-	} else if *cs != TestStoryBad {
-		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, TestStoryBad)
+	} else if *cs != testStoryBad {
+		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, testStoryBad)
 	}
 }
 
 func TestGetCustomStories(t *testing.T) {
 
-	storyList, err := GetCustomStories("custom_stories")
+	storyList, err := GetCustomStories("testdata/custom_stories")
 
 	if err != nil {
 		t.Error(err)
@@ -120,10 +120,10 @@ func TestGetCustomStories(t *testing.T) {
 	EscapeModFound := false
 	for _, cs := range storyList {
 		t.Log(*cs)
-		if *cs != TestStoryEscape {
+		if *cs != testStoryEscape {
 			EscapeModFound = true
 		}
-		if *cs != TestStoryMyMod {
+		if *cs != testStoryMyMod {
 			MyModFound = true
 		}
 	}

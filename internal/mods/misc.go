@@ -1,14 +1,11 @@
-package main
+package mods
 
 import (
 	"errors"
 	"os"
-)
 
-var execMap = map[string]string{
-	"windows": ".\\Amnesia_NoSteam.exe",
-	"linux":   "./Amnesia_NOSTEAM.bin.x86_64",
-}
+	"modmanager/internal/logger"
+)
 
 func CheckIsRootDir(dir string) error {
 	if dir == "" {
@@ -46,24 +43,8 @@ func CheckIsRootDir(dir string) error {
 	return errors.New("unknown issue with the work directory") // func should never reach here but static analysis complains about not returning
 }
 
-func formatStringList(list []string) string {
-	folderList := ""
-	for _, f := range list {
-		folderList += f + "\n"
-	}
-	return folderList
-}
-
-// For FC display card - stops it from shrinking
-func getStringSpacer(width int) string {
-	spacer := ""
-	for i := 0; i < width; i++ {
-		spacer += " "
-	}
-	return spacer
-}
-
-func isModNil(mod Mod) bool {
+// TODO get rid of this
+func IsModNil(mod Mod) bool {
 	// assigning structs which implement interfaces which are nil is not the same as assigning nil;
 	// this means that interface == nil will return false in such cases
 	csNil := (*CustomStory)(nil)
@@ -71,12 +52,12 @@ func isModNil(mod Mod) bool {
 	return mod == nil || mod == csNil || mod == fcNil
 }
 
-func deleteModDir(path string) error {
-	InfoLogger.Println("trying to delete:", path)
+func DeleteModDir(path string) error {
+	logger.Info.Println("trying to delete:", path)
 
 	// Check if img file exists
 	if _, err := os.Stat(path); err != nil {
-		ErrorLogger.Println(err)
+		logger.Error.Println(err)
 		return err
 	}
 
