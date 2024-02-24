@@ -46,7 +46,8 @@ func GetMainInitConfigs(path string) ([]string, error) {
 			logger.Error.Println(err, "in", path)
 			return fmt.Errorf("GetMainInitConfigs: %w", err)
 		}
-		if !d.IsDir() && d.Name() == mainInitStr {
+		// Ignore base game init
+		if !d.IsDir() && d.Name() == mainInitStr && path != "config/main_init.cfg" {
 			mainInits = append(mainInits, path)
 		}
 		return nil
@@ -222,32 +223,21 @@ func GetFullConversions(path string) ([]*FullConversion, error) {
 		return nil, fmt.Errorf("GetFullConversions: %w", err)
 	}
 
-	// Find and remove base game init
-
-	for i, init := range initList {
-		if init == "config/main_init.cfg" {
-			initList = append(initList[:i], initList[i+1:]...)
-			break
-		}
-	}
 	logger.Info.Println("Found main init configs:", initList)
 
 	fcList := make([]*FullConversion, 0, len(initList))
 
 	for _, init := range initList {
 		fc, err := GetConversionFromInit(init)
-
 		if err != nil {
-			logger.Error.Println("Error while reading full conversion from", init, "-", err)
+			logger.Error.Println("Error while reading full conversion from", init, ":", err)
+			continue
 		}
-
-		if fc != nil {
-			fcList = append(fcList, fc)
-		}
+		fcList = append(fcList, fc)
 	}
 
 	if len(fcList) == 0 {
-		return nil, errors.New("did not find any valid full conversions")
+		return nil, errors.New("GetFullConversions: did not find any valid full conversions")
 	}
 
 	return fcList, nil

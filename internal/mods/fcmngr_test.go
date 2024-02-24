@@ -95,8 +95,8 @@ func TestGetMainInitConfigs(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(mainInits) < 2 {
-		t.Errorf("Did not find one of the main inits. Got: %s", mainInits)
+	if len(mainInits) != 2 {
+		t.Errorf("Number of main_inits differs from 2. Got: %s", mainInits)
 	} else if mainInits[0] != "SomeMod/config/main_init.cfg" && mainInits[1] != "wn_config/main_init.cfg" {
 		t.Errorf("Did not find one of the main inits. Got: %s", mainInits)
 	}
