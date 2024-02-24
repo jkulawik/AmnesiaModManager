@@ -53,33 +53,27 @@ func GetDescFromLang(filepath string) (string, error) {
 	}
 
 	// Search categories
-	var categoryCustomStoryMain configs.LangXMLCategory
-	isMainCategoryInLang := false
-
+	var categoryCustomStoryMain *configs.LangXMLCategory
 	for _, cat := range langxml.Categories {
 		if cat.Name == "CustomStoryMain" {
-			categoryCustomStoryMain = cat
-			isMainCategoryInLang = true
+			categoryCustomStoryMain = &cat
 			break
 		}
 	}
-	if !isMainCategoryInLang {
+	if categoryCustomStoryMain == nil {
 		return "This custom story has no description (missing CustomStoryMain category).", nil
 	}
 	//t.Log(categoryCustomStoryMain)
 
 	// Search category for entry
-	var entryCustomStoryDesc configs.LangXMLEntry
-	isDescInCategory := false
-
+	var entryCustomStoryDesc *configs.LangXMLEntry
 	for _, entry := range categoryCustomStoryMain.Entries {
 		if entry.Name == "Description" {
-			entryCustomStoryDesc = entry
-			isDescInCategory = true
+			entryCustomStoryDesc = &entry
 			break
 		}
 	}
-	if !isDescInCategory {
+	if entryCustomStoryDesc == nil {
 		return "This custom story has no description (missing description entry).", nil
 	}
 
@@ -136,7 +130,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	cs.Desc, err = GetDescFromLang(dir + "/" + cs.LangFile)
 
 	if err != nil {
-		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" {
+		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" { // TODO use string contains here
 			logger.Warn.Println(cs.Dir, err)
 			return cs, nil
 		}
