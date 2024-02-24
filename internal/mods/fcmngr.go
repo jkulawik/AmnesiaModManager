@@ -55,9 +55,8 @@ func GetMainInitConfigs(path string) ([]string, error) {
 
 	if len(mainInits) == 0 {
 		return nil, errors.New("no full conversion init files found")
-	} else {
-		return mainInits, nil
 	}
+	return mainInits, nil
 }
 
 func ReadConversionInit(path string) (*configs.MainInitXML, error) {
@@ -75,12 +74,10 @@ func ReadConversionInit(path string) (*configs.MainInitXML, error) {
 	if *mi == *empty {
 		return nil, fmt.Errorf("ReadConversionInit: XML parser returned an empty object with error: %w", err)
 	}
-
 	if err != nil {
 		return nil, fmt.Errorf("ReadConversionInit: %w", err)
-	} else {
-		return mi, nil
 	}
+	return mi, nil
 }
 
 func GetUniqueResources(path string) ([]string, error) {
@@ -185,9 +182,8 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 	logger.Info.Println("Logo candidates:", logoCandidates)
 	if len(logoCandidates) == 0 {
 		return "", errors.New("mod logo could not be found")
-	} else {
-		return logoCandidates[0], nil
 	}
+	return logoCandidates[0], nil
 }
 
 func GetConversionFromInit(path string) (*FullConversion, error) {

@@ -106,9 +106,8 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 			logger.Warn.Println(err)
 			cs = makeInvalidStory(dir)
 			return cs, nil
-		} else {
-			return nil, fmt.Errorf("GetStoryFromDir: %w", err)
 		}
+		return nil, fmt.Errorf("GetStoryFromDir: %w", err)
 	}
 
 	cs.Dir = dir
@@ -140,9 +139,8 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" {
 			logger.Warn.Println(cs.Dir, err)
 			return cs, nil
-		} else {
-			return cs, fmt.Errorf("GetStoryFromDir: %w", err)
 		}
+		return cs, fmt.Errorf("GetStoryFromDir: %w", err)
 	}
 
 	return cs, nil
