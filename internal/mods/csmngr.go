@@ -13,7 +13,7 @@ import (
 )
 
 func MakeStoryText(cs *CustomStory) string {
-	return fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.dir, cs.desc)
+	return fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.Dir, cs.Desc)
 }
 
 func ReadCustomStoryConfig(filepath string) (*configs.CSXML, error) {
@@ -92,10 +92,10 @@ func GetDescFromLang(filepath string) (string, error) {
 func makeInvalidStory(dir string) *CustomStory {
 	EmptyDirStory := new(CustomStory)
 
-	EmptyDirStory.name = "Invalid custom story"
-	EmptyDirStory.author = "N/A"
-	EmptyDirStory.dir = dir
-	EmptyDirStory.desc = "A folder was found which is not a valid custom story."
+	EmptyDirStory.Name = "Invalid custom story"
+	EmptyDirStory.Author = "N/A"
+	EmptyDirStory.Dir = dir
+	EmptyDirStory.Desc = "A folder was found which is not a valid custom story."
 
 	return EmptyDirStory
 }
@@ -114,37 +114,37 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 		}
 	}
 
-	cs.dir = dir
-	cs.author = csxml.Author
-	cs.name = csxml.Name
-	cs.imgFile = csxml.ImgFile
+	cs.Dir = dir
+	cs.Author = csxml.Author
+	cs.Name = csxml.Name
+	cs.ImgFile = csxml.ImgFile
 
 	// Check if img file exists
-	if _, err := os.Stat(cs.dir + "/" + cs.imgFile); err != nil {
+	if _, err := os.Stat(cs.Dir + "/" + cs.ImgFile); err != nil {
 		logger.Warn.Println(err)
-		cs.imgFile = ""
+		cs.ImgFile = ""
 	}
 
 	if csxml.ExtraLangFilePrefix != "" {
 		if csxml.DefaultExtraLangFile == "" {
-			cs.langFile = csxml.ExtraLangFilePrefix + "english.lang"
+			cs.LangFile = csxml.ExtraLangFilePrefix + "english.lang"
 		} else {
-			cs.langFile = csxml.ExtraLangFilePrefix + csxml.DefaultExtraLangFile
+			cs.LangFile = csxml.ExtraLangFilePrefix + csxml.DefaultExtraLangFile
 		}
 	} else if csxml.DefaultExtraLangFile != "" {
-		cs.langFile = "extra_" + csxml.DefaultExtraLangFile
+		cs.LangFile = "extra_" + csxml.DefaultExtraLangFile
 	} else {
-		cs.langFile = "extra_english.lang"
+		cs.LangFile = "extra_english.lang"
 	}
 
-	cs.desc, err = GetDescFromLang(dir + "/" + cs.langFile)
+	cs.Desc, err = GetDescFromLang(dir + "/" + cs.LangFile)
 
 	if err != nil {
 		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" {
-			logger.Warn.Println(cs.dir, err)
+			logger.Warn.Println(cs.Dir, err)
 			return cs, nil
 		} else {
-			logger.Error.Println(cs.dir, err)
+			logger.Error.Println(cs.Dir, err)
 			return cs, err
 		}
 	}

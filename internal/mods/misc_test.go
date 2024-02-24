@@ -1,7 +1,6 @@
-package misc
+package mods
 
 import (
-	"modmanager/internal/mods"
 	"testing"
 )
 
@@ -15,23 +14,23 @@ func TestCheckIsRootDir(t *testing.T) {
 }
 
 func TestIsModNil(t *testing.T) {
-	var selectedMod mods.Mod
+	var selectedMod Mod
 	// selectedMod = nil
-	x := isModNil(selectedMod)
+	x := IsModNil(selectedMod)
 	if !x {
 		t.Error("Mod is nil but IsModNil returned false")
 	}
-	var selectedStory *mods.CustomStory
+	var selectedStory *CustomStory
 	// selectedStory = nil
 	selectedMod = selectedStory
-	x = isModNil(selectedMod)
+	x = IsModNil(selectedMod)
 	if !x {
 		t.Error("Mod is type CS nil but IsModNil returned false")
 	}
-	var selectedConversion *mods.FullConversion
+	var selectedConversion *FullConversion
 	// selectedConversion = nil
 	selectedMod = selectedConversion
-	x = isModNil(selectedMod)
+	x = IsModNil(selectedMod)
 	if !x {
 		t.Error("Mod is type FC nil but IsModNil returned false")
 	}

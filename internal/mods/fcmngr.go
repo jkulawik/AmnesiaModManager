@@ -212,19 +212,19 @@ func GetConversionFromInit(path string) (*FullConversion, error) {
 	}
 
 	fc := new(FullConversion)
-	fc.name = init.Variables.GameName
-	fc.mainInitConfig = path
+	fc.Name = init.Variables.GameName
+	fc.MainInitConfig = path
 	res, err := GetUniqueResources(init.ConfigFiles.Resources)
 	if err != nil {
 		return nil, err
 	}
-	fc.uniqueResources = res
+	fc.UniqueResources = res
 	menuPath := init.ConfigFiles.Menu
 	logo, err := GetLogoFromMenuConfig(menuPath, res)
 	if err != nil {
 		logger.Warn.Println("Error while searching for logo:", err)
 	}
-	fc.logo = logo
+	fc.Logo = logo
 
 	return fc, nil
 }

@@ -1,11 +1,10 @@
-package misc
+package mods
 
 import (
 	"errors"
 	"os"
 
 	"modmanager/internal/logger"
-	"modmanager/internal/mods"
 )
 
 func CheckIsRootDir(dir string) error {
@@ -45,15 +44,15 @@ func CheckIsRootDir(dir string) error {
 }
 
 // TODO get rid of this
-func isModNil(mod mods.Mod) bool {
+func IsModNil(mod Mod) bool {
 	// assigning structs which implement interfaces which are nil is not the same as assigning nil;
 	// this means that interface == nil will return false in such cases
-	csNil := (*mods.CustomStory)(nil)
-	fcNil := (*mods.FullConversion)(nil)
+	csNil := (*CustomStory)(nil)
+	fcNil := (*FullConversion)(nil)
 	return mod == nil || mod == csNil || mod == fcNil
 }
 
-func deleteModDir(path string) error {
+func DeleteModDir(path string) error {
 	logger.Info.Println("trying to delete:", path)
 
 	// Check if img file exists
