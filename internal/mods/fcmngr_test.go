@@ -12,63 +12,6 @@ var TestWhiteNight = FullConversion{
 	UniqueResources: []string{"wn_models", "wn_sounds", "wn_graphics", "wn_models", "wn_music"},
 }
 
-var someModRes = []string{"SomeMod", "SomeMod/misc"}
-
-func TestReadConversionInit(t *testing.T) {
-	fc, err := ReadConversionInit("testdata/SomeMod/config/main_init.cfg")
-	t.Logf("FC: %s", fc)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if fc.Variables.GameName != "A full conversion" {
-		t.Errorf("Wrong FC name: %s", fc.Variables.GameName)
-	}
-}
-
-func TestGetUniqueResources(t *testing.T) {
-	res, err := GetUniqueResources("testdata/SomeMod/config/resources.cfg")
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	resString := fmt.Sprintf("%v", res)
-	testString := fmt.Sprintf("%v", someModRes)
-
-	if resString != testString {
-		t.Errorf("Parsed resource list differs expected. Original:\n%s\nGot:\n%s", testString, resString)
-	}
-
-}
-
-func TestGetLogoFromMenuConfigPng(t *testing.T) {
-	logo, err := GetLogoFromMenuConfig("testdata/wn_config/menu.cfg", TestWhiteNight.UniqueResources)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("Logo path: %s", logo)
-
-	if logo != "testdata/wn_graphics/graphics/main_menu/wn_menu_logo.png" {
-		t.Errorf("Wrong FC logo: %s", logo)
-	}
-}
-
-func TestGetLogoFromMenuConfigTga(t *testing.T) {
-	logo, err := GetLogoFromMenuConfig("testdata/SomeMod/config/menu.cfg", []string{"/SomeMod"})
-
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("Logo path: %s", logo)
-
-	if logo != "testdata/SomeMod/menu_logo.tga" {
-		t.Errorf("Wrong FC logo: %s", logo)
-	}
-}
-
 func TestGetConversionFromInit(t *testing.T) {
 	fc, err := GetConversionFromInit("testdata/wn_config/main_init.cfg")
 	if err != nil {
@@ -88,8 +31,8 @@ func TestGetConversionFromInit(t *testing.T) {
 	}
 }
 
-func TestGetMainInitConfigs(t *testing.T) {
-	mainInits, err := GetMainInitConfigs("testdata")
+func TestGetMainInitFilepaths(t *testing.T) {
+	mainInits, err := GetMainInitFilepaths("testdata")
 
 	if err != nil {
 		t.Fatal(err)

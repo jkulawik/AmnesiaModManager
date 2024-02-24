@@ -1,5 +1,11 @@
 package configs
 
+import (
+	"encoding/xml"
+	"fmt"
+	"os"
+)
+
 // TODO Improve: A lot of this data isn't really needed and could be removed if the unmarshaller still works afterwards
 
 type MainInitXML struct {
@@ -49,4 +55,25 @@ type MainInitXMLStartMap struct {
 	File   string `xml:"File,attr"`
 	Folder string `xml:"Folder,attr"`
 	Pos    string `xml:"Pos,attr"`
+}
+
+func ReadConversionInit(path string) (*MainInitXML, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("ReadConversionInit: %w", err)
+	}
+	// We need to wrap the config in a dummy tag to get it to unmarshal properly
+	data = []byte("<dummy>" + string(data) + "</dummy>")
+
+	mi := new(MainInitXML)
+	empty := new(MainInitXML)
+	err = xml.Unmarshal(data, mi)
+
+	if *mi == *empty {
+		return nil, fmt.Errorf("ReadConversionInit: XML parser returned an empty object with error: %w", err)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("ReadConversionInit: %w", err)
+	}
+	return mi, nil
 }
