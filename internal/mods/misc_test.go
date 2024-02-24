@@ -5,7 +5,7 @@ import (
 )
 
 func TestCheckIsRootDir(t *testing.T) {
-	err := CheckIsRootDir(".")
+	err := CheckIsRootDir("testdata")
 
 	if err != nil {
 		t.Error(err)

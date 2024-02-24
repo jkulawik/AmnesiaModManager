@@ -6,20 +6,20 @@ import (
 )
 
 var TestWhiteNight = FullConversion{
-	name:            "White Night",
-	mainInitConfig:  "wn_config/main_init.cfg",
-	logo:            "wn_graphics/graphics/main_menu/wn_menu_logo.png",
-	uniqueResources: []string{"wn_models", "wn_sounds", "wn_graphics", "wn_models", "wn_music"},
+	Name:            "White Night",
+	MainInitConfig:  "wn_config/main_init.cfg",
+	Logo:            "wn_graphics/graphics/main_menu/wn_menu_logo.png",
+	UniqueResources: []string{"wn_models", "wn_sounds", "wn_graphics", "wn_models", "wn_music"},
 }
 
 var someModRes = []string{"SomeMod", "SomeMod/misc"}
 
 func TestReadConversionInit(t *testing.T) {
-	fc, err := ReadConversionInit("SomeMod/config/main_init.cfg")
+	fc, err := ReadConversionInit("testdata/SomeMod/config/main_init.cfg")
 	t.Logf("FC: %s", fc)
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	if fc.Variables.GameName != "A full conversion" {
@@ -28,10 +28,10 @@ func TestReadConversionInit(t *testing.T) {
 }
 
 func TestGetUniqueResources(t *testing.T) {
-	res, err := GetUniqueResources("SomeMod/config/resources.cfg")
+	res, err := GetUniqueResources("testdata/SomeMod/config/resources.cfg")
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	resString := fmt.Sprintf("%v", res)
@@ -43,41 +43,40 @@ func TestGetUniqueResources(t *testing.T) {
 
 }
 
-func TestGetLogoFromMenuConfig(t *testing.T) {
-	logo, err := GetLogoFromMenuConfig("wn_config/menu.cfg", TestWhiteNight.uniqueResources)
-	t.Logf("Logo path: %s", logo)
+func TestGetLogoFromMenuConfigPng(t *testing.T) {
+	logo, err := GetLogoFromMenuConfig("testdata/wn_config/menu.cfg", TestWhiteNight.UniqueResources)
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
+	t.Logf("Logo path: %s", logo)
 
-	if logo != "wn_graphics/graphics/main_menu/wn_menu_logo.png" {
+	if logo != "testdata/wn_graphics/graphics/main_menu/wn_menu_logo.png" {
 		t.Errorf("Wrong FC logo: %s", logo)
 	}
 }
 
-func TestGetLogoFromMenuConfig2(t *testing.T) {
-	logo, err := GetLogoFromMenuConfig("SomeMod/config/menu.cfg", []string{"/SomeMod"})
-	t.Logf("Logo path: %s", logo)
+func TestGetLogoFromMenuConfigTga(t *testing.T) {
+	logo, err := GetLogoFromMenuConfig("testdata/SomeMod/config/menu.cfg", []string{"/SomeMod"})
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
+	t.Logf("Logo path: %s", logo)
 
-	if logo != "SomeMod/menu_logo.tga" {
+	if logo != "testdata/SomeMod/menu_logo.tga" {
 		t.Errorf("Wrong FC logo: %s", logo)
 	}
 }
 
 func TestGetConversionFromInit(t *testing.T) {
-	path := "wn_config/main_init.cfg"
-	fc, err := GetConversionFromInit(path)
+	fc, err := GetConversionFromInit("testdata/wn_config/main_init.cfg")
 	if err != nil {
-		t.Errorf("GetConversionFromInit returned an error: %s", err)
+		t.Fatal(err)
 	}
 
 	if fc == nil {
-		t.Fatal("FATAL: GetConversionFromInit returned nil")
+		t.Fatal("GetConversionFromInit returned nil")
 	}
 
 	// Structs with arrays aren't comparable, easiest solution is to cast them to string
@@ -90,10 +89,10 @@ func TestGetConversionFromInit(t *testing.T) {
 }
 
 func TestGetMainInitConfigs(t *testing.T) {
-	mainInits, err := GetMainInitConfigs()
+	mainInits, err := GetMainInitConfigs("testdata")
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	if len(mainInits) < 2 {
@@ -104,10 +103,10 @@ func TestGetMainInitConfigs(t *testing.T) {
 }
 
 func TestGetFullConversions(t *testing.T) {
-	fcList, err := GetFullConversions()
+	fcList, err := GetFullConversions("testdata")
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	for _, fc := range fcList {

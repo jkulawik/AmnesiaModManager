@@ -18,7 +18,6 @@ func MakeStoryText(cs *CustomStory) string {
 
 func ReadCustomStoryConfig(filepath string) (*configs.CSXML, error) {
 	fileSystem := os.DirFS(".")
-
 	// data, err := os.ReadFile(filepath)
 	data, err := fs.ReadFile(fileSystem, filepath)
 	if err != nil {
@@ -30,7 +29,7 @@ func ReadCustomStoryConfig(filepath string) (*configs.CSXML, error) {
 	err = xml.Unmarshal(data, csxml)
 
 	if *csxml == *empty {
-		return nil, errors.New(filepath + ": XML parser returned an empty object")
+		return nil, errors.New(filepath + ": XML parser returned an empty object") // TODO wrap error
 	}
 
 	if err != nil {

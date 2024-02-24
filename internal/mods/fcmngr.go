@@ -3,9 +3,9 @@ package mods
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
-	"strings"
 
 	"modmanager/internal/configs"
 	"modmanager/internal/logger"
@@ -38,15 +38,15 @@ var baseResources = []string{
 
 const mainInitStr = "main_init.cfg"
 
-func GetMainInitConfigs() ([]string, error) {
-	fileSystem := os.DirFS(".")
+func GetMainInitConfigs(path string) ([]string, error) {
+	fileSystem := os.DirFS(path)
 
 	mainInits := make([]string, 0)
 
 	fs.WalkDir(fileSystem, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			logger.Error.Println(err, "in", path)
-			return err
+			return fmt.Errorf("GetMainInitConfigs: %w", err)
 		}
 		if !d.IsDir() && d.Name() == mainInitStr {
 			mainInits = append(mainInits, path)
@@ -64,7 +64,7 @@ func GetMainInitConfigs() ([]string, error) {
 func ReadConversionInit(path string) (*configs.MainInitXML, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ReadConversionInit: %w", err)
 	}
 	// We need to wrap the config in a dummy tag to get it to unmarshal properly
 	data = []byte("<dummy>" + string(data) + "</dummy>")
@@ -74,11 +74,11 @@ func ReadConversionInit(path string) (*configs.MainInitXML, error) {
 	err = xml.Unmarshal(data, mi)
 
 	if *mi == *empty {
-		return nil, errors.New(path + ": XML parser returned an empty object")
+		return nil, fmt.Errorf("ReadConversionInit: XML parser returned an empty object with error: %w", err)
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ReadConversionInit: %w", err)
 	} else {
 		return mi, nil
 	}
@@ -87,18 +87,18 @@ func ReadConversionInit(path string) (*configs.MainInitXML, error) {
 func GetUniqueResources(path string) ([]string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetUniqueResources: %w", err)
 	}
 
 	res := new(configs.ResourcesXML)
 	err = xml.Unmarshal(data, res)
 
 	if len(res.Directory) == 0 {
-		return nil, errors.New(path + ": XML parser returned an empty object")
+		return nil, fmt.Errorf("GetUniqueResources: XML parser returned an empty object with error: %w", err)
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetUniqueResources: %w", err)
 	} else {
 		resFolders := make([]string, 0)
 		for _, entry := range res.Directory {
@@ -131,12 +131,7 @@ func GetUniqueResources(path string) ([]string, error) {
 func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
-		if strings.Contains(err.Error(), "no such file or directory") {
-			logger.Warn.Println("GetLogoFromMenuConfig: file", filepath, "doesn't exist")
-			return "", nil
-		} else {
-			return "", err
-		}
+		return "", fmt.Errorf("error while reading menu config: %w", err)
 	}
 
 	// We need to wrap the config in a dummy tag to get it to unmarshal properly
@@ -167,7 +162,7 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 	walkFunc := func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			logger.Error.Println(err)
-			return err
+			return fmt.Errorf("GetLogoFromMenuConfig: %w occured while crawling the filesystem", err)
 		}
 		if !d.IsDir() && d.Name() == searchName {
 			alreadyFound := false
@@ -208,7 +203,7 @@ func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) 
 func GetConversionFromInit(path string) (*FullConversion, error) {
 	init, err := ReadConversionInit(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetConversionFromInit: %w", err)
 	}
 
 	fc := new(FullConversion)
@@ -216,25 +211,26 @@ func GetConversionFromInit(path string) (*FullConversion, error) {
 	fc.MainInitConfig = path
 	res, err := GetUniqueResources(init.ConfigFiles.Resources)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetConversionFromInit: %w", err)
 	}
 	fc.UniqueResources = res
 	menuPath := init.ConfigFiles.Menu
 	logo, err := GetLogoFromMenuConfig(menuPath, res)
 	if err != nil {
-		logger.Warn.Println("Error while searching for logo:", err)
+		logger.Warn.Println("Unexpected error while searching for logo, no logo will be used. Error:", err)
+		logo = ""
 	}
 	fc.Logo = logo
 
 	return fc, nil
 }
 
-func GetFullConversions() ([]*FullConversion, error) {
+func GetFullConversions(path string) ([]*FullConversion, error) {
 
-	initList, err := GetMainInitConfigs()
+	initList, err := GetMainInitConfigs(path)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetFullConversions: %w", err)
 	}
 
 	// Find and remove base game init
@@ -262,7 +258,7 @@ func GetFullConversions() ([]*FullConversion, error) {
 	}
 
 	if len(fcList) == 0 {
-		return nil, errors.New("did not find any full conversions")
+		return nil, errors.New("did not find any valid full conversions")
 	}
 
 	return fcList, nil

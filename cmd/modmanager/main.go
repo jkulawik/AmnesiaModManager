@@ -69,7 +69,7 @@ func main() {
 
 	customStories, err = mods.GetCustomStories(csPath)
 	displayIfError(err, mainWindow)
-	fullConversions, err = mods.GetFullConversions()
+	fullConversions, err = mods.GetFullConversions(".")
 	displayIfError(err, mainWindow)
 
 	windowContent = container.NewMax()
@@ -210,7 +210,7 @@ func refreshMods(w fyne.Window) {
 
 	customStories, err = mods.GetCustomStories(csPath)
 	displayIfError(err, w)
-	fullConversions, err = mods.GetFullConversions()
+	fullConversions, err = mods.GetFullConversions(".")
 	displayIfError(err, w)
 
 	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
