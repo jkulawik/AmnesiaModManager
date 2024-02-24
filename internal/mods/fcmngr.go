@@ -11,29 +11,27 @@ import (
 	"modmanager/internal/logger"
 )
 
-var baseResources = []string{
-	"/_temp",
-	"/fonts",
-	"/maps",
-	"/textures",
-	"/models",
-	"/gui",
-	"/static_objects",
-	"/sounds",
-	"/main_menu",
-	"/shaders",
-	"/lights",
-	"/billboards",
-	"/entities",
-	"/graphics",
-	"/viewer",
-	"/particles",
-	"/models",
-	"/music",
-	"/flashbacks",
-	"/textures",
-	"/misc",
-	"/commentary",
+var baseResources = map[string]bool{
+	"/_temp":          true,
+	"/fonts":          true,
+	"/maps":           true,
+	"/textures":       true,
+	"/models":         true,
+	"/gui":            true,
+	"/static_objects": true,
+	"/sounds":         true,
+	"/main_menu":      true,
+	"/shaders":        true,
+	"/lights":         true,
+	"/billboards":     true,
+	"/entities":       true,
+	"/graphics":       true,
+	"/viewer":         true,
+	"/particles":      true,
+	"/music":          true,
+	"/flashbacks":     true,
+	"/misc":           true,
+	"/commentary":     true,
 }
 
 const mainInitStr = "main_init.cfg"
@@ -93,39 +91,30 @@ func GetUniqueResources(path string) ([]string, error) {
 	res := new(configs.ResourcesXML)
 	err = xml.Unmarshal(data, res)
 
-	if len(res.Directory) == 0 {
-		return nil, fmt.Errorf("GetUniqueResources: XML parser returned an empty object with error: %w", err)
-	}
-
 	if err != nil {
 		return nil, fmt.Errorf("GetUniqueResources: %w", err)
-	} else {
-		resFolders := make([]string, 0)
-		for _, entry := range res.Directory {
-			// Don't include folders of the base game
-			isInBaseResources := false
-
-			for _, baseResource := range baseResources {
-				if entry.Path == baseResource {
-					isInBaseResources = true
-					break
-				}
-			}
-
-			if !isInBaseResources {
-				resFolders = append(resFolders, entry.Path)
-			}
-
-		}
-
-		for i, entry := range resFolders {
-			if string(entry[0]) == "/" {
-				resFolders[i] = entry[1:]
-			}
-		}
-
-		return resFolders, nil
 	}
+	if len(res.Directory) == 0 {
+		return nil, errors.New("GetUniqueResources: no directories found in resources file")
+	}
+
+	resourceDirs := make([]string, 0)
+	for _, entry := range res.Directory {
+		// Don't include folders of the base game
+		_, isBase := baseResources[entry.Path]
+		if !isBase {
+			resourceDirs = append(resourceDirs, entry.Path)
+		}
+	}
+
+	// Remove root slash
+	for i, entry := range resourceDirs {
+		if string(entry[0]) == "/" {
+			resourceDirs[i] = entry[1:]
+		}
+	}
+
+	return resourceDirs, nil
 }
 
 func GetLogoFromMenuConfig(filepath string, resources []string) (string, error) {
