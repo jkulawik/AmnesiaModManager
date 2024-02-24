@@ -151,20 +151,20 @@ func GetCustomStories(dir string) ([]*CustomStory, error) {
 	if err != nil {
 		return nil, fmt.Errorf("GetCustomStories: %w", err)
 	}
+
 	csList := make([]*CustomStory, 0, len(filelist))
-
 	for _, direntry := range filelist {
-		if direntry.IsDir() {
-			path := dir + "/" + direntry.Name()
-			cs, err := GetStoryFromDir(path)
+		if !direntry.IsDir() {
+			continue
+		}
+		cs, err := GetStoryFromDir(dir + "/" + direntry.Name())
 
-			if cs != nil {
-				csList = append(csList, cs)
-			}
-			if err != nil {
-				logger.Error.Println("GetCustomStories: ", err)
-				// Can't return nil due to an error because finding one doesn't mean the entire list is invalid
-			}
+		if err != nil {
+			logger.Error.Println("GetCustomStories: ", err)
+			// Can't return nil due to an error because finding one doesn't mean the entire list is invalid
+		}
+		if cs != nil {
+			csList = append(csList, cs)
 		}
 	}
 
