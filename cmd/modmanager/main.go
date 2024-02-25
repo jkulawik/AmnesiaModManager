@@ -29,7 +29,9 @@ const (
 		"Custom stories can be deleted entirely.\n" +
 		"Full conversions might leave leftovers because many of them\n" +
 		"do not properly list all of their folders and files in their config."
-
+	deleteWorkshopItemInfo = "deleting Steam Workshop mods directly is disabled because Steam\n" +
+		"will redownload the mod automatically.\n" +
+		"Please unsubscribe from the Workshop items instead"
 	isTestDataBuild = true
 	csPath          = "custom_stories"
 	workshopPath    = "../../workshop/content/57300"
@@ -161,6 +163,12 @@ func refreshMods(w fyne.Window) {
 func deleteSelectedMod(w fyne.Window) {
 	if mods.IsModNil(selectedMod) {
 		displayIfError(errors.New("no mod selected"), w)
+		return
+	}
+
+	cs, ok := selectedMod.(*mods.CustomStory)
+	if ok && cs.IsSteamWorkshop {
+		dialog.ShowError(errors.New(deleteWorkshopItemInfo), w)
 		return
 	}
 
