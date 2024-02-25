@@ -3,18 +3,10 @@ package main
 import (
 	"embed"
 	"errors"
-	"image"
 	"image/jpeg"
-	"os"
 	"os/exec"
 	"runtime"
 	"strings"
-
-	// the _ means to import a package purely for its initialization side effects;
-	// in this case png has to be registered, otherwise it causes errors about pngs being tga for some god forsaken reason
-	_ "image/png"
-
-	"github.com/ftrvxmtrx/tga"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -105,7 +97,6 @@ func makeToolbar(window fyne.Window, app fyne.App) fyne.CanvasObject {
 }
 
 func makeModTypeTabs() fyne.CanvasObject {
-
 	csTabContent := container.NewMax()
 	csTabContent.Objects = []fyne.CanvasObject{makeCustomStoryListTab()}
 	// csTabContent.Refresh()  // doesn't seem to be needed
@@ -119,16 +110,71 @@ func makeModTypeTabs() fyne.CanvasObject {
 		container.NewTabItem("Full Conversions", fcTabContent),
 	)
 
-	tabs.OnSelected = setCurrentMod
-
+	tabs.OnSelected = func(currentTab *container.TabItem) {
+		if currentTab.Text == "Full Conversions" {
+			selectedMod = selectedConversion
+		} else if currentTab.Text == "Custom Stories" {
+			selectedMod = selectedStory
+		}
+	}
 	return tabs
 }
 
-func setCurrentMod(currentTab *container.TabItem) {
-	if currentTab.Text == "Full Conversions" {
-		selectedMod = selectedConversion
-	} else if currentTab.Text == "Custom Stories" {
-		selectedMod = selectedStory
+// ----------------------- General ----------------------- //
+
+func displayIfError(err error, w fyne.Window) {
+	if err != nil {
+		logger.Error.Println(err)
+		dialog.ShowError(err, w)
+	}
+}
+
+func showSettings(a fyne.App) {
+	w := a.NewWindow("Theme Settings")
+	w.SetContent(settings.NewSettings().LoadAppearanceScreen(w))
+	w.Resize(fyne.NewSize(480, 480))
+	w.Show()
+}
+
+func refreshMods(w fyne.Window) {
+	selectedConversion = nil
+	selectedStory = nil
+	selectedMod = nil
+
+	var err error
+	customStories, err = mods.GetCustomStories(csPath)
+	displayIfError(err, w)
+	fullConversions, err = mods.GetFullConversions(".")
+	displayIfError(err, w)
+
+	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
+	windowContent.Refresh()
+}
+
+func deleteSelectedMod(w fyne.Window) {
+	if mods.IsModNil(selectedMod) {
+		displayIfError(errors.New("no mod selected"), w)
+		return
+	}
+
+	folderList := strings.Join(selectedMod.ListFolders(), "\n")
+
+	warningMessage := "Delete the following folders?\n\n" + folderList + "\n"
+	warningMessage += "\nAll files will be deleted permanently.\n\nMod saves will not be deleted."
+
+	cnf := dialog.NewConfirm("Confirmation", warningMessage, confirmDeleteCallback, w)
+	cnf.SetDismissText("No")
+	cnf.SetConfirmText("Yes")
+	cnf.Show()
+}
+
+func confirmDeleteCallback(response bool) {
+	if response {
+		for _, f := range selectedMod.ListFolders() {
+			err := mods.DeleteModDir(f)
+			displayIfError(err, mainWindow)
+		}
+		refreshMods(mainWindow)
 	}
 }
 
@@ -172,14 +218,20 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 		cardContentLabel.SetText(data[id].GetStoryText())
 
 		if data[id].ImgFile == "" {
-			// card.SetImage(defaultImg)
 			displayImg = defaultImg
 		} else {
 			imgFile := data[id].Dir + "/" + data[id].ImgFile
 			displayImg = canvas.NewImageFromFile(imgFile)
-			// card.SetImage(displayImg)
 		}
 		storyViewContainer.Objects[0] = displayImg
+
+		if data[id].Logo == "" {
+			card.SetImage(nil)
+		} else {
+			displayImg := getImageFromFile(data[id].Logo)
+			displayImg.FillMode = canvas.ImageFillContain
+			card.SetImage(displayImg)
+		}
 	}
 	list.OnUnselected = func(id widget.ListItemID) {
 		selectedStory = nil
@@ -188,69 +240,9 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 		card.SetSubTitle("")
 		cardContentLabel.SetText("")
 	}
-	// listTab := container.NewHSplit(list, container.New(layout.NewVBoxLayout(), card))
 	listTab := container.NewHSplit(list, storyViewContainer)
 	listTab.SetOffset(0.3)
 	return listTab
-}
-
-// ----------------------- General ----------------------- //
-
-func displayIfError(err error, w fyne.Window) {
-	if err != nil {
-		logger.Error.Println(err)
-		dialog.ShowError(err, w)
-	}
-}
-
-func showSettings(a fyne.App) {
-	w := a.NewWindow("Theme Settings")
-	w.SetContent(settings.NewSettings().LoadAppearanceScreen(w))
-	w.Resize(fyne.NewSize(480, 480))
-	w.Show()
-}
-
-func refreshMods(w fyne.Window) {
-	var err error
-
-	selectedConversion = nil
-	selectedStory = nil
-	selectedMod = nil
-
-	customStories, err = mods.GetCustomStories(csPath)
-	displayIfError(err, w)
-	fullConversions, err = mods.GetFullConversions(".")
-	displayIfError(err, w)
-
-	windowContent.Objects = []fyne.CanvasObject{makeModTypeTabs()}
-	windowContent.Refresh()
-}
-
-func deleteSelectedMod(w fyne.Window) {
-	if mods.IsModNil(selectedMod) {
-		displayIfError(errors.New("no mod selected"), w)
-		return
-	}
-
-	folderList := strings.Join(selectedMod.ListFolders(), "\n")
-
-	warningMessage := "Delete the following folders?\n\n" + folderList + "\n"
-	warningMessage += "\nAll files will be deleted permanently.\n\nMod saves will not be deleted."
-
-	cnf := dialog.NewConfirm("Confirmation", warningMessage, confirmDeleteCallback, w)
-	cnf.SetDismissText("No")
-	cnf.SetConfirmText("Yes")
-	cnf.Show()
-}
-
-func confirmDeleteCallback(response bool) {
-	if response {
-		for _, f := range selectedMod.ListFolders() {
-			err := mods.DeleteModDir(f)
-			displayIfError(err, mainWindow)
-		}
-		refreshMods(mainWindow)
-	}
 }
 
 // ----------------------- FC tab ----------------------- //
@@ -269,11 +261,8 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	launchButton := widget.NewButton("Launch", launchFullConversion)
 	launchButton.Hide()
 
-	vbox := container.NewVBox(card, launchButton)
-	hbox := container.NewHBox(vbox)
-
-	// fcViewContainer := container.New(layout.NewMaxLayout(), defaultImg, card)
-	fcViewContainer := container.New(layout.NewMaxLayout(), defaultImg, hbox)
+	vbox := container.NewVBox(card, layout.NewSpacer(), launchButton)
+	fcViewContainer := container.New(layout.NewMaxLayout(), defaultImg, vbox)
 
 	list := widget.NewList(
 		func() int {
@@ -289,8 +278,6 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	list.OnSelected = func(id widget.ListItemID) {
 		selectedConversion = data[id]
 		selectedMod = selectedConversion
-		// card.SetSubTitle("Author: " + data[id].author)
-		// cardContentLabel.SetText(data[id].GetStoryText())
 		// cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
 		// folderString := formatStringList(data[id].uniqueResources)
 		// cardContentLabel.SetText("Mod folder(s):\n" + folderString)
@@ -298,16 +285,14 @@ func makeFullConversionListTab() fyne.CanvasObject {
 
 		// logger.Info.Println(data[id].Name, "logo:", data[id].Logo)
 
+		card.SetTitle(data[id].Name)
+		// card.SetSubTitle(strings.Repeat(" ", 90)) // to not let the card shrink too much
+		// card.SetSubTitle("")
 		if data[id].Logo == "" {
 			card.SetImage(nil)
-			card.SetTitle(data[id].Name)
 		} else {
-			card.SetTitle(data[id].Name) // TODO we have the logo, no need to clutter the space further?
-			// card.SetSubTitle(strings.Repeat(" ", 90)) // to not let the card shrink too much
-			// card.SetSubTitle("")
-
 			displayImg := getImageFromFile(data[id].Logo)
-			displayImg.FillMode = canvas.ImageFillOriginal
+			displayImg.FillMode = canvas.ImageFillContain
 			card.SetImage(displayImg)
 		}
 	}
@@ -319,33 +304,9 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		cardContentLabel.SetText("")
 		launchButton.Hide()
 	}
-	// listTab := container.NewHSplit(list, container.New(layout.NewVBoxLayout(), card))
 	listTab := container.NewHSplit(list, fcViewContainer)
 	listTab.SetOffset(0.3)
 	return listTab
-}
-
-func loadTGA(path string) image.Image {
-	// TODO This should return errors
-	imgRaw, err := os.Open(path)
-	if err != nil {
-		logger.Error.Println(err)
-	}
-	img, err := tga.Decode(imgRaw)
-	if err != nil {
-		logger.Error.Println(err)
-	}
-	return img
-}
-
-func getImageFromFile(path string) *canvas.Image {
-	// TODO this should handle and return errors
-	if strings.Contains(path, ".tga") {
-		img := loadTGA(path)
-		return canvas.NewImageFromImage(img)
-	} else {
-		return canvas.NewImageFromFile(path)
-	}
 }
 
 func launchFullConversion() {
