@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"modmanager/internal/logger"
 	"os"
+	"strings"
 )
 
 type MenuXML struct {
@@ -71,11 +72,11 @@ func GetLogoPathFromMenuConfig(filepath string, resources []string) (string, err
 
 	walkFunc := func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			logger.Error.Println("GetLogoFromMenuConfig: fs.WalkDir walkFunc:", err)
+			logger.Warn.Println("GetLogoFromMenuConfig: fs.WalkDir walkFunc:", err)
 			// Note: this return is consumed by fs.WalkDir so it won't show in logs or in app
 			return fmt.Errorf("GetLogoFromMenuConfig: %w occured while crawling the filesystem", err)
 		}
-		if !d.IsDir() && d.Name() == searchName {
+		if !d.IsDir() && strings.HasSuffix(path, searchName) {
 			alreadyFound := false
 			for _, candidate := range logoCandidates {
 				if path == candidate {
@@ -101,9 +102,11 @@ func GetLogoPathFromMenuConfig(filepath string, resources []string) (string, err
 	}
 
 	// Search base game folders as a last ditch resort; this will search some dirs again so walkFunc checks for doubles
-	fs.WalkDir(fileSystem, ".", walkFunc)
+	if len(logoCandidates) == 0 {
+		fs.WalkDir(fileSystem, ".", walkFunc)
+	}
 
-	// logger.Info.Println("Logo candidates:", logoCandidates)
+	logger.Info.Println("Logo candidates:", logoCandidates)
 	if len(logoCandidates) == 0 {
 		return "", errors.New("GetLogoFromMenuConfig: mod logo could not be found")
 	}

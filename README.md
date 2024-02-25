@@ -1,21 +1,21 @@
 # AmnesiaModManager
 A simple mod manager for "Amnesia: The Dark Descent".
 
-![](/assets/screenshot_01.png)
+![](/screenshots/screenshot_01.png)
 
 Features:
 * Browse mods
-  * Custom Stories tab displays all the in-game data: title, author, description, background image, as well as the folder name that the CS is installed in
-  * Full Conversions tab displays the mod title and its logo (if one is used)
+  * Custom Stories: displays all the in-game data: title, author, description, background image, as well as the folder name that the CS is installed in
+  * Full Conversions: displays the mod title and its logo (if one is used)
+  * Hybrid mods: The app now supports the hybrid mod type added in Amnesia 1.5. These show up in the custom story tab, but show more info than regular custom stories
 * Delete mods
-  * Custom Stories can be deleted entirely
+  * Custom Stories can be deleted entirely (including hybrid mods)
   * Deleting Full Conversions is supported, but how well it works depends on the mod set-up. Properly configured mods get deleted correctly, but messy mods might leave leftovers
 * Launch Full Conversions from one place
-  * Currently supported only for the Steam release (the app can only start the NoSteam version due to Steam's DRM)
-  * Warning: on some Windows computers this feature has a bug with the game not registering mouse clicks
+  * Currently supported only for the Steam release. The app can only start the NoSteam version due to Steam's DRM.
 * Theme settings - light/dark, highlight color, font size
 
-![](/assets/screenshot_02.png)
+![](/screenshots/screenshot_02.png)
 
 This program was made mostly as practice with test-driven development and a test of the Fyne GUI package,
 but it can prove useful to people who play a lot of Amnesia mods.
@@ -29,4 +29,7 @@ This is mostly due to the fact that Go is a language rarely used on desktops; yo
 
 Get the program (modmanger.exe) for your system from the releases section and place it in your Amnesia install folder (next to Amnesia.exe). 
 
-If you have Go installed, you can also compile it yourself by running `go build .` in the project folder.
+# Known issues
+
+On *some* Windows computers launching an FC stops the game registering mouse clicks.
+

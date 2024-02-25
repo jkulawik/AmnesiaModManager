@@ -62,7 +62,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	cs.Desc, err = configs.GetDescFromLang(cs.Dir + "/" + cs.LangFile)
 
 	if err != nil {
-		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" { // TODO use string contains here
+		if strings.Contains(err.Error(), "invalid sequence \"--\" not allowed in comments") {
 			logger.Warn.Println(cs.Dir, err)
 			return cs, nil
 		}

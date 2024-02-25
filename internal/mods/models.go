@@ -32,7 +32,7 @@ func (cs CustomStory) ListFolders() []string {
 func (cs CustomStory) GetStoryText() string {
 	desc := fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.Dir, cs.Desc)
 	if cs.IsHybrid {
-		desc += "\n\nThis custom story is a full conversion and can also be launched in-game."
+		desc += "\n\nThis custom story is a hybrid full conversion custom story and can also be launched in-game."
 	}
 	return desc
 }

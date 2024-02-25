@@ -24,7 +24,6 @@ type LangXMLEntry struct {
 }
 
 func GetDescFromLang(filepath string) (string, error) {
-
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 		return "Lang file not found", fmt.Errorf("GetDescFromLang: %w", err)
