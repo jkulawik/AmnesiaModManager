@@ -8,6 +8,7 @@ import (
 
 	// the _ means to import a package purely for its initialization side effects;
 	// in this case png has to be registered, otherwise it causes errors about pngs being tga for some god forsaken reason
+	_ "image/jpeg"
 	_ "image/png"
 
 	"fyne.io/fyne/v2/canvas"
