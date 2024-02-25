@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"strings"
 
 	"modmanager/internal/configs"
 	"modmanager/internal/logger"
@@ -42,18 +43,28 @@ func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 	fc := new(FullConversion)
 	fc.Name = init.Variables.GameName
 	fc.MainInitConfig = path
-	res, err := configs.GetUniqueResourceDirs(workdir + "/" + init.ConfigFiles.Resources)
+
+	// logger.Info.Println(init.Variables.GameName, "workdir:", workdir)
+	// Note: hybrid mods will show up in this search but their workdir is the root dir, so their resources.cfg path won't be valid
+
+	// Clean up Windows filth
+	clean_res_path := strings.ReplaceAll(init.ConfigFiles.Resources, "\\", "/")
+	res, err := configs.GetUniqueResourceDirs(workdir + "/" + clean_res_path)
 	if err != nil {
 		return nil, fmt.Errorf("GetConversionFromInit (%s): %w", path, err)
 	}
 	fc.UniqueResources = res
-	logo, err := configs.GetLogoPathFromMenuConfig(workdir+"/"+init.ConfigFiles.Menu, res)
+
+	// Clean up Windows filth
+	clean_logo_path := strings.ReplaceAll(init.ConfigFiles.Menu, "\\", "/")
+	logo, err := configs.GetLogoPathFromMenuConfig(workdir+"/"+clean_logo_path, res)
 	if err != nil {
 		logger.Warn.Printf("GetConversionFromInit (%s): %s\n", path, err)
 		logo = ""
 	}
 	fc.Logo = logo
-	fc.LangFile = init.GetLangName()
+	// Clean up Windows filth
+	fc.LangFile = strings.ReplaceAll(init.GetLangName(), "\\", "/")
 
 	return fc, nil
 }

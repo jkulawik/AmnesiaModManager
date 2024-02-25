@@ -37,10 +37,10 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	cs.Dir = dir
 	cs.Author = csxml.Author
 	cs.Name = csxml.Name
-	cs.ImgFile = csxml.ImgFile
+	cs.ImgFile = strings.ReplaceAll(csxml.ImgFile, "\\", "/")
 	cs.IsHybrid = csxml.InitCfgFile != ""
 	if cs.IsHybrid {
-		cs.InitCfgFile = csxml.InitCfgFile
+		cs.InitCfgFile = strings.ReplaceAll(csxml.InitCfgFile, "\\", "/")
 	}
 
 	// Check if img file exists

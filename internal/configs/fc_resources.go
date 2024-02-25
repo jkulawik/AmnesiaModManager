@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type ResourcesXML struct {
@@ -58,15 +59,18 @@ func GetUniqueResourceDirs(path string) ([]string, error) {
 
 	resourceDirs := make([]string, 0)
 	for _, entry := range res.Directory {
+		// Clean up Windows filth
+		clean_path := strings.ReplaceAll(entry.Path, "\\", "/")
 		// Don't include folders of the base game
-		_, isBase := baseResources[entry.Path]
+		_, isBase := baseResources[clean_path]
 		if !isBase {
-			resourceDirs = append(resourceDirs, entry.Path)
+			resourceDirs = append(resourceDirs, clean_path)
 		}
 	}
 
-	// Remove root slash
 	for i, entry := range resourceDirs {
+
+		// Remove root slash
 		if string(entry[0]) == "/" {
 			resourceDirs[i] = entry[1:]
 		}
