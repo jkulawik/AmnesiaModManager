@@ -7,7 +7,9 @@ import (
 )
 
 type LangXML struct {
-	XMLName    xml.Name          `xml:"LANGUAGE"`
+	// turns out the marshaller doesn't need the root tag to get its contents;
+	// this allows us to handle lang files with non-standard root tag names (extremely rare but oh well)
+	// XMLName    xml.Name          `xml:"LANGUAGE"`
 	Categories []LangXMLCategory `xml:"CATEGORY"`
 }
 
