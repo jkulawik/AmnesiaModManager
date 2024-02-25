@@ -12,6 +12,9 @@ var testStoryMyMod = CustomStory{
 	"testdata/custom_stories/MyMod",
 	"Error while parsing lang file XML.",
 	"customstory.png",
+	"",
+	false,
+	false,
 }
 
 var testStoryEscape = CustomStory{
@@ -21,6 +24,9 @@ var testStoryEscape = CustomStory{
 	"testdata/custom_stories/_ESCAPE",
 	"Another epic plot about people getting Amnesia",
 	"yellow.jpg",
+	"",
+	false,
+	false,
 }
 
 var testStoryBad = CustomStory{
@@ -30,40 +36,9 @@ var testStoryBad = CustomStory{
 	"testdata/custom_stories/BadMod",
 	"I don't know how you can miss the damn image.",
 	"",
-}
-
-func TestReadCustomStoryConfig(t *testing.T) {
-	csxml, err := ReadCustomStoryConfig("testdata/custom_stories/MyMod/custom_story_settings.cfg")
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	t.Log(*csxml)
-
-	if csxml.Author != "Mudbill" {
-		t.Errorf("wrong Author parameter: %s instead of Mudbill", csxml.Author)
-	}
-	if csxml.Name != "Tutorial" {
-		t.Errorf("wrong Author parameter: %s instead of Tutorial", csxml.Name)
-	}
-	if csxml.ImgFile != "customstory.png" {
-		t.Errorf("wrong Author parameter: %s instead of customstory.png", csxml.ImgFile)
-	}
-
-}
-
-func TestGetDescFromLang(t *testing.T) {
-
-	desc, err := GetDescFromLang("testdata/custom_stories/_ESCAPE/extra_english.lang")
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	if desc != "Another epic plot about people getting Amnesia" {
-		t.Errorf("wrong description: %s", desc)
-	}
+	"",
+	false,
+	false,
 }
 
 func TestGetStoryFromDir(t *testing.T) {

@@ -1,5 +1,7 @@
 package mods
 
+import "fmt"
+
 type Mod interface {
 	// This interface is needed basically only to allow deletion of both CS and FC mods
 	ListFolders() []string
@@ -15,10 +17,22 @@ type CustomStory struct {
 	Dir      string
 	Desc     string
 	ImgFile  string
+
+	InitCfgFile     string
+	IsHybrid        bool
+	IsSteamWorkshop bool
 }
 
 func (cs CustomStory) ListFolders() []string {
 	return []string{cs.Dir}
+}
+
+func (cs CustomStory) GetStoryText() string {
+	desc := fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.Dir, cs.Desc)
+	if cs.IsHybrid {
+		desc += "\n\nThis custom story is a full conversion and can also be launched in-game."
+	}
+	return desc
 }
 
 /*

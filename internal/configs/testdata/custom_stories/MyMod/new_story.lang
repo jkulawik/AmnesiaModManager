@@ -1,0 +1,46 @@
+<LANGUAGE>
+
+	<!-- You can delete or add any lines contained in <!-- and what ends this notice if you wish.
+	These are only comments made to help organize your file. Remember that some
+	category names MUST NOT be changed, or else they won't work. For example 
+	CustomStoryMain and Journal must stay, but you're free to add any additional 
+	categories with your own names. Have fun! -Mudbill -->
+	
+	<CATEGORY Name="CustomStoryMain">
+		<Entry Name="Description">Description of Custom Story.</Entry>
+	</CATEGORY>
+	<CATEGORY Name="Journal">
+
+		<!-- Notes -->
+		<Entry Name="Note_NoteStranger_Name">Note from Stranger</Entry>
+		<Entry Name="Note_NoteStranger_Text">Hello.[br][br][br]You don't know me, but I certainly know you.</Entry>
+
+		<!-- Diaries -->
+		<Entry Name="Diary_DearDiary_Name1">End of the World</Entry>
+		<Entry Name="Diary_DearDiary_Text1">21 December, 2012[br][br]The ground is literally shaking beneath my feet.</Entry>
+
+		<!-- Mementos -->
+		<Entry Name="Quest_MyMemento_Text">Perhaps I should go the other way.</Entry>
+	</CATEGORY>
+	<CATEGORY Name="Inventory">
+
+		<!-- Item Names/Descriptions -->
+		<Entry Name="ItemName_DoorKey">A Key</Entry>
+		<Entry Name="ItemDesc_DoorKey">It's for unlocking a door.</Entry>
+	</CATEGORY>
+	<CATEGORY Name="Sign">
+
+		<!-- Signs -->
+		<Entry Name="SignStudy">Study Room</Entry>
+	</CATEGORY>
+	<CATEGORY Name="Levels">
+
+		<!-- Levels -->
+		<Entry Name="LevelHall">Main Hall</Entry>
+	</CATEGORY>
+	<CATEGORY Name="DeathHint">
+
+		<!-- Death Hints -->
+		<Entry Name="DHint1">You have to carry on...</Entry>
+	</CATEGORY>
+</LANGUAGE>

@@ -1,84 +1,14 @@
 package mods
 
 import (
-	"encoding/xml"
 	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 	"strings"
 
 	"modmanager/internal/configs"
 	"modmanager/internal/logger"
 )
-
-func MakeStoryText(cs *CustomStory) string {
-	return fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.Dir, cs.Desc)
-}
-
-func ReadCustomStoryConfig(filepath string) (*configs.CSXML, error) {
-	fileSystem := os.DirFS(".")
-	// data, err := os.ReadFile(filepath)
-	data, err := fs.ReadFile(fileSystem, filepath)
-	if err != nil {
-		return nil, fmt.Errorf("ReadCustomStoryConfig: %w", err)
-	}
-
-	csxml := new(configs.CSXML)
-	// empty := new(configs.CSXML)
-	err = xml.Unmarshal(data, csxml)
-
-	// if *csxml == *empty {
-	// }
-
-	if err != nil {
-		return nil, fmt.Errorf("ReadCustomStoryConfig: XML parser encountered an error: %w", err)
-	}
-	return csxml, nil
-}
-
-func GetDescFromLang(filepath string) (string, error) {
-
-	data, err := os.ReadFile(filepath)
-	if err != nil {
-		return "Lang file not found", fmt.Errorf("GetDescFromLang: %w", err)
-	}
-
-	langxml := new(configs.LangXML)
-	err = xml.Unmarshal(data, langxml)
-	// t.Log(langxml)
-
-	if err != nil {
-		return "Error while parsing lang file XML.", fmt.Errorf("GetDescFromLang: %w", err)
-	}
-
-	// Search categories
-	var categoryCustomStoryMain *configs.LangXMLCategory
-	for _, cat := range langxml.Categories {
-		if cat.Name == "CustomStoryMain" {
-			categoryCustomStoryMain = &cat
-			break
-		}
-	}
-	if categoryCustomStoryMain == nil {
-		return "This custom story has no description (missing CustomStoryMain category).", nil
-	}
-	//t.Log(categoryCustomStoryMain)
-
-	// Search category for entry
-	var entryCustomStoryDesc *configs.LangXMLEntry
-	for _, entry := range categoryCustomStoryMain.Entries {
-		if entry.Name == "Description" {
-			entryCustomStoryDesc = &entry
-			break
-		}
-	}
-	if entryCustomStoryDesc == nil {
-		return "This custom story has no description (missing description entry).", nil
-	}
-
-	return entryCustomStoryDesc.Content, nil
-}
 
 func makeInvalidStory(dir string) *CustomStory {
 	EmptyDirStory := new(CustomStory)
@@ -92,7 +22,7 @@ func makeInvalidStory(dir string) *CustomStory {
 }
 
 func GetStoryFromDir(dir string) (*CustomStory, error) {
-	csxml, err := ReadCustomStoryConfig(dir + "/custom_story_settings.cfg")
+	csxml, err := configs.ReadCustomStoryConfig(dir + "/custom_story_settings.cfg")
 	cs := new(CustomStory)
 
 	if err != nil {
@@ -108,6 +38,8 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	cs.Author = csxml.Author
 	cs.Name = csxml.Name
 	cs.ImgFile = csxml.ImgFile
+	cs.InitCfgFile = csxml.InitCfgFile
+	cs.IsHybrid = cs.InitCfgFile != ""
 
 	// Check if img file exists
 	if _, err := os.Stat(cs.Dir + "/" + cs.ImgFile); err != nil {
@@ -127,7 +59,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 		cs.LangFile = "extra_english.lang"
 	}
 
-	cs.Desc, err = GetDescFromLang(dir + "/" + cs.LangFile)
+	cs.Desc, err = configs.GetDescFromLang(dir + "/" + cs.LangFile)
 
 	if err != nil {
 		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" { // TODO use string contains here

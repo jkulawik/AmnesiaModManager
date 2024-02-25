@@ -108,11 +108,11 @@ func makeModTypeTabs() fyne.CanvasObject {
 
 	csTabContent := container.NewMax()
 	csTabContent.Objects = []fyne.CanvasObject{makeCustomStoryListTab()}
-	csTabContent.Refresh()
+	// csTabContent.Refresh()  // doesn't seem to be needed
 
 	fcTabContent := container.NewMax()
 	fcTabContent.Objects = []fyne.CanvasObject{makeFullConversionListTab()}
-	fcTabContent.Refresh()
+	// fcTabContent.Refresh()  // doesn't seem to be needed
 
 	tabs := container.NewAppTabs(
 		container.NewTabItem("Custom Stories", csTabContent),
@@ -153,10 +153,15 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 			return len(data)
 		},
 		func() fyne.CanvasObject {
-			return container.New(layout.NewHBoxLayout(), widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
+			return container.New(layout.NewHBoxLayout(), widget.NewIcon(theme.FolderIcon()), widget.NewLabel("Template Object"))
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
+			// Note: this is an update function that runs in a loop
 			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id].Name)
+			if data[id].IsHybrid {
+				item.(*fyne.Container).Objects[0].(*widget.Icon).Resource = theme.FolderNewIcon()
+				item.(*fyne.Container).Objects[0].(*widget.Icon).Refresh()
+			}
 		},
 	)
 	list.OnSelected = func(id widget.ListItemID) {
@@ -164,7 +169,7 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 		selectedMod = selectedStory
 		card.SetTitle(data[id].Name)
 		card.SetSubTitle("Author: " + data[id].Author)
-		cardContentLabel.SetText(mods.MakeStoryText(data[id]))
+		cardContentLabel.SetText(data[id].GetStoryText())
 
 		if data[id].ImgFile == "" {
 			// card.SetImage(defaultImg)
@@ -275,7 +280,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 			return len(data)
 		},
 		func() fyne.CanvasObject {
-			return container.New(layout.NewHBoxLayout(), widget.NewIcon(theme.FileApplicationIcon()), widget.NewLabel("Template Object"))
+			return container.New(layout.NewHBoxLayout(), widget.NewIcon(theme.FolderNewIcon()), widget.NewLabel("Template Object"))
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
 			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id].Name)
@@ -285,7 +290,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		selectedConversion = data[id]
 		selectedMod = selectedConversion
 		// card.SetSubTitle("Author: " + data[id].author)
-		// cardContentLabel.SetText(mods.MakeStoryText(data[id]))
+		// cardContentLabel.SetText(data[id].GetStoryText())
 		// cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
 		// folderString := formatStringList(data[id].uniqueResources)
 		// cardContentLabel.SetText("Mod folder(s):\n" + folderString)
