@@ -13,6 +13,7 @@ var testStoryMyMod = CustomStory{
 	"Error while parsing lang file XML.",
 	"customstory.png",
 	"",
+	"",
 	false,
 	false,
 }
@@ -25,6 +26,7 @@ var testStoryEscape = CustomStory{
 	"Another epic plot about people getting Amnesia",
 	"yellow.jpg",
 	"",
+	"",
 	false,
 	false,
 }
@@ -35,6 +37,7 @@ var testStoryBad = CustomStory{
 	"extra_english.lang",
 	"testdata/custom_stories/BadMod",
 	"I don't know how you can miss the damn image.",
+	"",
 	"",
 	"",
 	false,

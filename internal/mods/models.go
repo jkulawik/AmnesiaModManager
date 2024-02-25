@@ -21,6 +21,7 @@ type CustomStory struct {
 	ImgFile  string
 
 	InitCfgFile     string
+	Logo            string
 	IsHybrid        bool
 	IsSteamWorkshop bool
 }

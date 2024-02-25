@@ -55,6 +55,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 			logger.Warn.Println("GetStoryFromDir:", err)
 		} else {
 			cs.LangFile = fc.LangFile
+			cs.Logo = fc.Logo
 		}
 	} else {
 		cs.LangFile = csxml.GetLangName()
