@@ -15,6 +15,8 @@ import (
 	"github.com/ftrvxmtrx/tga"
 )
 
+var imageCache = make(map[string]*canvas.Image)
+
 func loadTGA(path string) image.Image {
 	// TODO This should return errors
 	imgRaw, err := os.Open(path)
@@ -30,10 +32,16 @@ func loadTGA(path string) image.Image {
 
 func getImageFromFile(path string) *canvas.Image {
 	// TODO this should handle and return errors
-	if strings.Contains(path, ".tga") {
-		img := loadTGA(path)
-		return canvas.NewImageFromImage(img)
-	} else {
-		return canvas.NewImageFromFile(path)
+	img, ok := imageCache[path]
+	if ok {
+		return img
 	}
+	if strings.Contains(path, ".tga") {
+		tga := loadTGA(path)
+		img = canvas.NewImageFromImage(tga)
+	} else {
+		img = canvas.NewImageFromFile(path)
+	}
+	imageCache[path] = img
+	return img
 }
