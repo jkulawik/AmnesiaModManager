@@ -38,8 +38,10 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	cs.Author = csxml.Author
 	cs.Name = csxml.Name
 	cs.ImgFile = csxml.ImgFile
-	cs.InitCfgFile = csxml.InitCfgFile
-	cs.IsHybrid = cs.InitCfgFile != ""
+	cs.IsHybrid = csxml.InitCfgFile != ""
+	if cs.IsHybrid {
+		cs.InitCfgFile = csxml.InitCfgFile
+	}
 
 	// Check if img file exists
 	if _, err := os.Stat(cs.Dir + "/" + cs.ImgFile); err != nil {
@@ -47,8 +49,18 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 		cs.ImgFile = ""
 	}
 
-	cs.LangFile = csxml.GetLangName()
-	cs.Desc, err = configs.GetDescFromLang(dir + "/" + cs.LangFile)
+	if cs.IsHybrid {
+		logger.Info.Println(cs.Name, "is hybrid:", cs.InitCfgFile)
+		fc, err := GetConversionFromInit(dir, cs.Dir+"/"+cs.InitCfgFile)
+		if err != nil {
+			logger.Warn.Println("GetStoryFromDir:", err)
+		} else {
+			cs.LangFile = fc.LangFile
+		}
+	} else {
+		cs.LangFile = csxml.GetLangName()
+	}
+	cs.Desc, err = configs.GetDescFromLang(cs.Dir + "/" + cs.LangFile)
 
 	if err != nil {
 		if err.Error() == "XML syntax error on line 3: invalid sequence \"--\" not allowed in comments" { // TODO use string contains here

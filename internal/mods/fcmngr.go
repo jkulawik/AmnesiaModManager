@@ -33,7 +33,7 @@ func GetMainInitFilepaths(path string) ([]string, error) {
 	return mainInits, nil
 }
 
-func GetConversionFromInit(path string) (*FullConversion, error) {
+func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 	init, err := configs.ReadConversionInit(path)
 	if err != nil {
 		return nil, fmt.Errorf("GetConversionFromInit: %w", err)
@@ -42,24 +42,23 @@ func GetConversionFromInit(path string) (*FullConversion, error) {
 	fc := new(FullConversion)
 	fc.Name = init.Variables.GameName
 	fc.MainInitConfig = path
-	res, err := configs.GetUniqueResourceDirs(init.ConfigFiles.Resources)
+	res, err := configs.GetUniqueResourceDirs(workdir + "/" + init.ConfigFiles.Resources)
 	if err != nil {
 		return nil, fmt.Errorf("GetConversionFromInit: %w", err)
 	}
 	fc.UniqueResources = res
-	menuPath := init.ConfigFiles.Menu
-	logo, err := configs.GetLogoPathFromMenuConfig(menuPath, res)
+	logo, err := configs.GetLogoPathFromMenuConfig(workdir+"/"+init.ConfigFiles.Menu, res)
 	if err != nil {
 		logger.Warn.Println("Unexpected error while searching for logo, no logo will be used. Error:", err)
 		logo = ""
 	}
 	fc.Logo = logo
+	fc.LangFile = init.GetLangName()
 
 	return fc, nil
 }
 
 func GetFullConversions(workdir string) ([]*FullConversion, error) {
-
 	initList, err := GetMainInitFilepaths(workdir)
 
 	if err != nil {
@@ -71,7 +70,7 @@ func GetFullConversions(workdir string) ([]*FullConversion, error) {
 	fcList := make([]*FullConversion, 0, len(initList))
 
 	for _, init := range initList {
-		fc, err := GetConversionFromInit(init)
+		fc, err := GetConversionFromInit(workdir, init)
 		if err != nil {
 			logger.Error.Println("Error while reading full conversion from", init, ":", err)
 			continue

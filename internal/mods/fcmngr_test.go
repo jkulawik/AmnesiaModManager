@@ -7,13 +7,14 @@ import (
 
 var TestWhiteNight = FullConversion{
 	Name:            "White Night",
-	MainInitConfig:  "wn_config/main_init.cfg",
-	Logo:            "wn_graphics/graphics/main_menu/wn_menu_logo.png",
+	MainInitConfig:  "testdata/wn_config/main_init.cfg",
+	Logo:            "testdata/wn_graphics/graphics/main_menu/wn_menu_logo.png",
+	LangFile:        "english.lang",
 	UniqueResources: []string{"wn_models", "wn_sounds", "wn_graphics", "wn_models", "wn_music"},
 }
 
 func TestGetConversionFromInit(t *testing.T) {
-	fc, err := GetConversionFromInit("testdata/wn_config/main_init.cfg")
+	fc, err := GetConversionFromInit("testdata", "testdata/wn_config/main_init.cfg")
 	if err != nil {
 		t.Fatal(err)
 	}

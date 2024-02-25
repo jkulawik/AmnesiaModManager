@@ -77,3 +77,7 @@ func ReadConversionInit(path string) (*MainInitXML, error) {
 	}
 	return mi, nil
 }
+
+func (initXml *MainInitXML) GetLangName() string {
+	return initXml.ConfigFiles.DefaultGameLanguage
+}
