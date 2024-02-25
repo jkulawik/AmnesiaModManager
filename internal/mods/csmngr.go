@@ -50,7 +50,6 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	}
 
 	if cs.IsHybrid {
-		logger.Info.Println(cs.Name, "is hybrid:", cs.InitCfgFile)
 		fc, err := GetConversionFromInit(dir, cs.Dir+"/"+cs.InitCfgFile)
 		if err != nil {
 			logger.Warn.Println("GetStoryFromDir:", err)

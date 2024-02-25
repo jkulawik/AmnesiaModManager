@@ -36,7 +36,7 @@ func GetMainInitFilepaths(path string) ([]string, error) {
 func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 	init, err := configs.ReadConversionInit(path)
 	if err != nil {
-		return nil, fmt.Errorf("GetConversionFromInit: %w", err)
+		return nil, fmt.Errorf("GetConversionFromInit (%s): %w", path, err)
 	}
 
 	fc := new(FullConversion)
@@ -44,12 +44,12 @@ func GetConversionFromInit(workdir, path string) (*FullConversion, error) {
 	fc.MainInitConfig = path
 	res, err := configs.GetUniqueResourceDirs(workdir + "/" + init.ConfigFiles.Resources)
 	if err != nil {
-		return nil, fmt.Errorf("GetConversionFromInit: %w", err)
+		return nil, fmt.Errorf("GetConversionFromInit (%s): %w", path, err)
 	}
 	fc.UniqueResources = res
 	logo, err := configs.GetLogoPathFromMenuConfig(workdir+"/"+init.ConfigFiles.Menu, res)
 	if err != nil {
-		logger.Warn.Println("Unexpected error while searching for logo, no logo will be used. Error:", err)
+		logger.Warn.Printf("GetConversionFromInit (%s): %s\n", path, err)
 		logo = ""
 	}
 	fc.Logo = logo
