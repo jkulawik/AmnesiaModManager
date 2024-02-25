@@ -64,13 +64,15 @@ func GetFullConversions(workdir string) ([]*FullConversion, error) {
 	if err != nil {
 		return nil, fmt.Errorf("GetFullConversions: %w", err)
 	}
+	if len(initList) == 0 {
+		return nil, errors.New("GetFullConversions: did not find any main_init files")
+	}
 
 	logger.Info.Println("Found main init configs:", initList)
 
 	fcList := make([]*FullConversion, 0, len(initList))
-
 	for _, init := range initList {
-		fc, err := GetConversionFromInit(workdir, init)
+		fc, err := GetConversionFromInit(workdir, workdir+"/"+init)
 		if err != nil {
 			logger.Error.Println("Error while reading full conversion from", init, ":", err)
 			continue
