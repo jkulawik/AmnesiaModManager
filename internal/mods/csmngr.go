@@ -2,7 +2,9 @@ package mods
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"modmanager/internal/configs"
@@ -43,10 +45,24 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	}
 	cs.IsSteamWorkshop = strings.Contains(dir, "workshop/content/57300")
 
-	// Check if img file exists
+	// Check if img file exists at specified path; search mod for it otherwise
 	if _, err := os.Stat(cs.Dir + "/" + cs.ImgFile); err != nil {
-		logger.Warn.Println(err)
+		base_name := filepath.Base(cs.ImgFile)
 		cs.ImgFile = ""
+		logger.Warn.Printf("GetStoryFromDir: searching for %s manually because an error occured: %v\n", base_name, err)
+		walkFunc := func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				logger.Warn.Println("GetStoryFromDir: fs.WalkDir walkFunc:", err)
+				// Note: this return is consumed by fs.WalkDir so it won't show in logs or in app
+				return fmt.Errorf("GetStoryFromDir: %w occured while crawling the filesystem", err)
+			}
+			if d.Name() == base_name {
+				cs.ImgFile = path
+				return fs.SkipAll
+			}
+			return nil
+		}
+		fs.WalkDir(os.DirFS(cs.Dir), ".", walkFunc)
 	}
 
 	if cs.IsHybrid {
