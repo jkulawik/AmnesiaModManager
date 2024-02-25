@@ -192,7 +192,10 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 	//card.Image = defaultImg
 	displayImg := defaultImg
 
-	storyViewContainer := container.New(layout.NewMaxLayout(), displayImg, card)
+	launchButton := widget.NewButton("Launch", launchHybridCustomStory)
+	launchButton.Hide()
+	vbox := container.NewVBox(card, layout.NewSpacer(), launchButton)
+	storyViewContainer := container.New(layout.NewMaxLayout(), displayImg, vbox)
 
 	list := widget.NewList(
 		func() int {
@@ -232,6 +235,9 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 			displayImg.FillMode = canvas.ImageFillContain
 			card.SetImage(displayImg)
 		}
+		if data[id].IsHybrid {
+			launchButton.Show()
+		}
 	}
 	list.OnUnselected = func(id widget.ListItemID) {
 		selectedStory = nil
@@ -239,6 +245,7 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 		card.SetTitle(defaultTitle)
 		card.SetSubTitle("")
 		cardContentLabel.SetText("")
+		launchButton.Hide()
 	}
 	listTab := container.NewHSplit(list, storyViewContainer)
 	listTab.SetOffset(0.3)
@@ -278,6 +285,7 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	list.OnSelected = func(id widget.ListItemID) {
 		selectedConversion = data[id]
 		selectedMod = selectedConversion
+		cardContentLabel.SetText("Mod config location: " + data[id].MainInitConfig)
 		// cardContentLabel.SetText("This is a very very long text which should wrap around. White Night is an amazing mod, don't play it")
 		// folderString := formatStringList(data[id].uniqueResources)
 		// cardContentLabel.SetText("Mod folder(s):\n" + folderString)
@@ -286,7 +294,6 @@ func makeFullConversionListTab() fyne.CanvasObject {
 		// logger.Info.Println(data[id].Name, "logo:", data[id].Logo)
 
 		card.SetTitle(data[id].Name)
-		// card.SetSubTitle(strings.Repeat(" ", 90)) // to not let the card shrink too much
 		// card.SetSubTitle("")
 		if data[id].Logo == "" {
 			card.SetImage(nil)
@@ -309,7 +316,15 @@ func makeFullConversionListTab() fyne.CanvasObject {
 	return listTab
 }
 
+func launchHybridCustomStory() {
+	launchModFromInit(selectedStory.Dir + "/" + selectedStory.InitCfgFile)
+}
+
 func launchFullConversion() {
+	launchModFromInit(selectedConversion.MainInitConfig)
+}
+
+func launchModFromInit(init_file string) {
 	logger.Info.Println("Launch button pressed")
 
 	var execMap = map[string]string{
@@ -318,7 +333,7 @@ func launchFullConversion() {
 	}
 	gameExe := execMap[runtime.GOOS]
 
-	cmd := exec.Command(gameExe, selectedConversion.MainInitConfig)
+	cmd := exec.Command(gameExe, init_file)
 	// mainWindow.Hide() // TODO try if this fixes the FC issue
 
 	// bar := widget.NewProgressBarInfinite()
