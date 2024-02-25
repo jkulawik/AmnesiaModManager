@@ -31,7 +31,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 			cs = makeInvalidStory(dir)
 			return cs, nil
 		}
-		return nil, fmt.Errorf("GetStoryFromDir: %w", err)
+		return nil, fmt.Errorf("GetStoryFromDir (%s): %w", dir, err)
 	}
 
 	cs.Dir = dir
@@ -66,7 +66,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 			logger.Warn.Println(cs.Dir, err)
 			return cs, nil
 		}
-		return cs, fmt.Errorf("GetStoryFromDir: %w", err)
+		return cs, fmt.Errorf("GetStoryFromDir (%s): %w", dir, err)
 	}
 
 	return cs, nil
