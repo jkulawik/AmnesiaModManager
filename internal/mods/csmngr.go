@@ -47,18 +47,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 		cs.ImgFile = ""
 	}
 
-	if csxml.ExtraLangFilePrefix != "" {
-		if csxml.DefaultExtraLangFile == "" {
-			cs.LangFile = csxml.ExtraLangFilePrefix + "english.lang"
-		} else {
-			cs.LangFile = csxml.ExtraLangFilePrefix + csxml.DefaultExtraLangFile
-		}
-	} else if csxml.DefaultExtraLangFile != "" {
-		cs.LangFile = "extra_" + csxml.DefaultExtraLangFile
-	} else {
-		cs.LangFile = "extra_english.lang"
-	}
-
+	cs.LangFile = csxml.GetLangName()
 	cs.Desc, err = configs.GetDescFromLang(dir + "/" + cs.LangFile)
 
 	if err != nil {

@@ -36,3 +36,17 @@ func ReadCustomStoryConfig(filepath string) (*CSXML, error) {
 	}
 	return csxml, nil
 }
+
+func (csxml *CSXML) GetLangName() string {
+	if csxml.ExtraLangFilePrefix != "" {
+		if csxml.DefaultExtraLangFile == "" {
+			return csxml.ExtraLangFilePrefix + "english.lang"
+		} else {
+			return csxml.ExtraLangFilePrefix + csxml.DefaultExtraLangFile
+		}
+	} else if csxml.DefaultExtraLangFile != "" {
+		return "extra_" + csxml.DefaultExtraLangFile
+	} else {
+		return "extra_english.lang"
+	}
+}

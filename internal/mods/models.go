@@ -2,6 +2,8 @@ package mods
 
 import "fmt"
 
+// TODO make all methods use pointer receivers
+
 type Mod interface {
 	// This interface is needed basically only to allow deletion of both CS and FC mods
 	ListFolders() []string
