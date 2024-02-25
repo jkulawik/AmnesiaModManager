@@ -1,7 +1,6 @@
 package mods
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -42,6 +41,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	if cs.IsHybrid {
 		cs.InitCfgFile = strings.ReplaceAll(csxml.InitCfgFile, "\\", "/")
 	}
+	cs.IsSteamWorkshop = strings.Contains(dir, "workshop/content/57300")
 
 	// Check if img file exists
 	if _, err := os.Stat(cs.Dir + "/" + cs.ImgFile); err != nil {
@@ -96,7 +96,7 @@ func GetCustomStories(dir string) ([]*CustomStory, error) {
 	}
 
 	if len(csList) == 0 {
-		return nil, errors.New("did not find any folders in the custom story directory")
+		logger.Info.Println("did not find any folders in the " + dir + " directory")
 	}
 
 	return csList, nil

@@ -29,7 +29,15 @@ This is mostly due to the fact that Go is a language rarely used on desktops; yo
 
 Get the program (modmanger.exe) for your system from the releases section and place it in your Amnesia install folder (next to Amnesia.exe). 
 
+# Changelog
+
+* 1.2.6: first public release
+* 1.3.0:
+  * Added support for hybrid custom stories added in Amnesia 1.5 (i.e. full conversions that are launched from the game)
+  * Add support for detecting custom stories downloaded from the Steam Workshop
+  * Improved mod description formatting (previously the app displayed raw description contents)
+  * Heavily restructured the app code to use proper Go conventions
+
 # Known issues
 
 On *some* Windows computers launching an FC stops the game registering mouse clicks.
-

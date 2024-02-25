@@ -32,6 +32,7 @@ const (
 
 	isTestDataBuild = true
 	csPath          = "custom_stories"
+	workshopPath    = "../../workshop/content/57300"
 )
 
 var (
@@ -60,12 +61,15 @@ func main() {
 	a.SetIcon(fyne.NewStaticResource("icon.png", iconBytes))
 	mainWindow = a.NewWindow(mainTitle)
 
-	err := mods.CheckIsRootDir(".")
-	displayIfError(err, mainWindow)
-
+	var err error
 	customStories, err = mods.GetCustomStories(csPath)
 	displayIfError(err, mainWindow)
+	workshopStories, err := mods.GetCustomStories(workshopPath)
+	customStories = append(customStories, workshopStories...)
+	displayIfError(err, mainWindow)
 	fullConversions, err = mods.GetFullConversions(".")
+	displayIfError(err, mainWindow)
+	err = mods.CheckIsRootDir(".")
 	displayIfError(err, mainWindow)
 
 	windowContent = container.NewMax()
@@ -144,6 +148,9 @@ func refreshMods(w fyne.Window) {
 	var err error
 	customStories, err = mods.GetCustomStories(csPath)
 	displayIfError(err, w)
+	workshopStories, err := mods.GetCustomStories(workshopPath)
+	customStories = append(customStories, workshopStories...)
+	displayIfError(err, mainWindow)
 	fullConversions, err = mods.GetFullConversions(".")
 	displayIfError(err, w)
 
@@ -218,7 +225,8 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 		selectedMod = selectedStory
 		card.SetTitle(data[id].Name)
 		card.SetSubTitle("Author: " + data[id].Author)
-		cardContentLabel.SetText(data[id].GetStoryText())
+		description := data[id].GetStoryText()
+		cardContentLabel.SetText(description)
 
 		if data[id].ImgFile == "" {
 			displayImg = defaultImg

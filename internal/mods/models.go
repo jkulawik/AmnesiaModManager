@@ -1,6 +1,6 @@
 package mods
 
-import "fmt"
+import "strings"
 
 // TODO make all methods use pointer receivers
 
@@ -31,11 +31,21 @@ func (cs CustomStory) ListFolders() []string {
 }
 
 func (cs CustomStory) GetStoryText() string {
-	desc := fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.Dir, cs.Desc)
+	// desc := fmt.Sprintf("Folder:\n%s\nDescription:\n%s", cs.Dir, cs.Desc)
+	text := "Folder:\n" + cs.Dir
 	if cs.IsHybrid {
-		desc += "\n\nThis custom story is a hybrid full conversion custom story and can also be launched in-game."
+		text += "\nThis custom story is a hybrid full conversion and can be also launched from the game."
 	}
-	return desc
+	if cs.IsSteamWorkshop {
+		text += "\nThis custom story was downloaded from the Steam Workshop."
+	}
+	description := strings.Replace(cs.Desc, "\n", " ", -1) // -1 means no limit on how many replaced
+	description = strings.Replace(description, "\t", " ", -1)
+	description = strings.Replace(description, "  ", " ", -1)
+	description = strings.ReplaceAll(description, "[br]", "\n")
+	description = strings.TrimSpace(description)
+	text += "\n\nDescription:\n" + description
+	return text
 }
 
 /*

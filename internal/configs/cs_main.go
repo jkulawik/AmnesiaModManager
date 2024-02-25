@@ -3,7 +3,6 @@ package configs
 import (
 	"encoding/xml"
 	"fmt"
-	"io/fs"
 	"os"
 )
 
@@ -17,9 +16,9 @@ type CSXML struct {
 }
 
 func ReadCustomStoryConfig(filepath string) (*CSXML, error) {
-	fileSystem := os.DirFS(".")
-	// data, err := os.ReadFile(filepath)
-	data, err := fs.ReadFile(fileSystem, filepath)
+	// fileSystem := os.DirFS(".")
+	// data, err := fs.ReadFile(fileSystem, filepath)
+	data, err := os.ReadFile(filepath) // this is better because it supports going up a directory, which is needed for Steam workshop
 	if err != nil {
 		return nil, fmt.Errorf("ReadCustomStoryConfig: %w", err)
 	}
