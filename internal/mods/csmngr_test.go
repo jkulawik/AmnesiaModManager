@@ -51,7 +51,7 @@ func TestGetStoryFromDir(t *testing.T) {
 	if cs == nil {
 		t.Errorf("Received nil mod pointer")
 	} else if *cs != testStoryMyMod {
-		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, testStoryMyMod)
+		t.Errorf("Custom story did not match. Mock:\n%v\nRead:\n%v", cs, testStoryMyMod)
 	}
 }
 
@@ -65,7 +65,7 @@ func TestGetStoryFromDir2(t *testing.T) {
 	if cs == nil {
 		t.Errorf("Received nil mod pointer")
 	} else if *cs != testStoryEscape {
-		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, testStoryEscape)
+		t.Errorf("Custom story did not match. Mock:\n%v\nRead:\n%v", cs, testStoryEscape)
 	}
 }
 
@@ -79,7 +79,7 @@ func TestGetStoryNoImg(t *testing.T) {
 	if cs == nil {
 		t.Errorf("Received nil mod pointer")
 	} else if *cs != testStoryBad {
-		t.Errorf("Custom story did not match. Mock:\n%s\nRead:\n%s", cs, testStoryBad)
+		t.Errorf("Custom story did not match. Mock:\n%v\nRead:\n%v", cs, testStoryBad)
 	}
 }
 
