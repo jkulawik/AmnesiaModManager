@@ -247,9 +247,9 @@ func makeCustomStoryListTab() fyne.CanvasObject {
 		if data[id].Logo == "" {
 			card.SetImage(nil)
 		} else {
-			displayImg := getImageFromFile(data[id].Logo)
-			displayImg.FillMode = canvas.ImageFillContain
-			card.SetImage(displayImg)
+			logo := getImageFromFile(data[id].Logo)
+			logo.FillMode = canvas.ImageFillContain
+			card.SetImage(logo)
 		}
 		if data[id].IsHybrid {
 			launchButton.Show()
