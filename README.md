@@ -36,6 +36,7 @@ Get the program (modmanger.exe) for your system from the releases section and pl
   * Added support for hybrid custom stories added in Amnesia 1.5 (i.e. full conversions that are launched from the game)
   * Add support for detecting custom stories downloaded from the Steam Workshop
   * Improved mod description formatting (previously the app displayed raw description contents)
+  * Improved performance by adding an image cache
   * Heavily restructured the app code to use proper Go conventions
 
 # Known issues

@@ -341,8 +341,6 @@ func launchFullConversion() {
 }
 
 func launchModFromInit(init_file string) {
-	logger.Info.Println("Launch button pressed")
-
 	var execMap = map[string]string{
 		"windows": ".\\Amnesia_NoSteam.exe",
 		"linux":   "./Amnesia_NOSTEAM.bin.x86_64",
