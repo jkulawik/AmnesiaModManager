@@ -1,0 +1,13 @@
+<LANGUAGE>
+
+	<!-- You can delete or add any lines contained in <!-- and what ends this notice if you wish.
+	These are only comments made to help organize your file. Remember that some
+	category names -- MUST NOT be changed, or else they won't work. For example 
+	CustomStoryMain and Journal must stay, but you're free to add any additional 
+	categories with your own names. Have fun! -Mudbill -->
+	
+	<CATEGORY Name="CustomStoryMain">
+		<Entry Name="Description">Test how game reload and map changes affect the Chest entity type.</Entry>
+	</CATEGORY>
+
+</LANGUAGE>

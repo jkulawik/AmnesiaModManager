@@ -10,7 +10,7 @@ var testStoryMyMod = CustomStory{
 	"Mudbill",
 	"new_story.lang",
 	"testdata/custom_stories/MyMod",
-	"Error while parsing lang file XML.",
+	"Description of Custom Story.",
 	"customstory.png",
 	"",
 	"",

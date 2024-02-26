@@ -80,3 +80,15 @@ func TestGetDescFromLang(t *testing.T) {
 		t.Errorf("wrong description: %s", desc)
 	}
 }
+
+func TestGetDescFromLangDetectInvalid(t *testing.T) {
+	desc, err := GetDescFromLang("testdata/invalid.lang")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if desc != "Test how game reload and map changes affect the Chest entity type." {
+		t.Errorf("wrong description: %s", desc)
+	}
+}
