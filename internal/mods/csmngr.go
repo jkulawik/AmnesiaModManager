@@ -95,21 +95,51 @@ func GetCustomStories(dir string) ([]*CustomStory, error) {
 		return nil, fmt.Errorf("GetCustomStories: %w", err)
 	}
 
+	jobs := make(chan fs.DirEntry, len(filelist))     // bufferred so we can send all jobs without waiting for them to be consumed
+	results := make(chan *CustomStory, len(filelist)) // bufferred should make things faster because workers don't have to wait to send results
+
+	// Start 5 worker routines
+	for i := 0; i < 1; i++ {
+		go func() {
+			// Consume jobs and send the results
+			for dirEntry := range jobs {
+				if !dirEntry.IsDir() {
+					// We send nils so that the number of channel sends remains deterministic
+					results <- nil
+					continue
+				}
+				cs, err := GetStoryFromDir(dir + "/" + dirEntry.Name())
+
+				if err != nil {
+					logger.Error.Println("GetCustomStories: ", err)
+					results <- nil
+					continue
+				}
+				results <- cs
+			}
+		}()
+	}
+
+	// Start sending jobs into the pipeline
+	// logger.Info.Println("Fill the CS job pipeline")
+	for _, dirEntry := range filelist {
+		logger.Info.Println("Sending job", dirEntry.Name())
+		jobs <- dirEntry
+	}
+	close(jobs)
+
+	// Start consuming results
+	// logger.Info.Println("Start consuming the CS results pipeline")
 	csList := make([]*CustomStory, 0, len(filelist))
-	for _, direntry := range filelist {
-		if !direntry.IsDir() {
+	for i := 0; i < len(filelist); i++ {
+		result := <-results
+		logger.Info.Println("Consuming result", result)
+		if result == nil {
 			continue
 		}
-		cs, err := GetStoryFromDir(dir + "/" + direntry.Name())
-
-		if err != nil {
-			logger.Error.Println("GetCustomStories: ", err)
-			// Can't return nil due to an error because finding one doesn't mean the entire list is invalid
-		}
-		if cs != nil {
-			csList = append(csList, cs)
-		}
+		csList = append(csList, result)
 	}
+	close(results) // kinda optional
 
 	if len(csList) == 0 {
 		logger.Info.Println("did not find any folders in the " + dir + " directory")
