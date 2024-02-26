@@ -1,7 +1,7 @@
 # AmnesiaModManager
 A mod manager for "Amnesia: The Dark Descent".
 
-![](/screenshots/screenshot_01.png)
+![](/screenshots/screenshot_02.png)
 
 Features:
 * Browse all installed mods
@@ -18,7 +18,8 @@ Features:
   * Hybrid mods can also be started from the app
 * Theme settings - light/dark, highlight color, font size
 
-![](/screenshots/screenshot_02.png)
+![](/screenshots/screenshot_01.png)
+![](/screenshots/screenshot_03.png)
 
 # Disclaimer
 
