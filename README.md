@@ -39,6 +39,7 @@ Get the program (modmanger.exe) for your system from the [releases](https://gith
   * Add support for detecting custom stories downloaded from the Steam Workshop
   * Improved mod description formatting (previously the app displayed raw description contents)
   * Improved performance by adding an image cache
+  * Improved lang file loading by correcting invalid XML comments (Amnesia's tinyXML doesn't mind `--` inside comments, but Go's standard library does)
   * Heavily restructured the app code to use proper Go conventions
 
 # Known issues
