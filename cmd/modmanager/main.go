@@ -25,7 +25,7 @@ import (
 
 const (
 	mainTitle      = "Amnesia Mod Manager"
-	appInfo        = "Amnesia Mod Manager v1.3.0\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
+	appInfo        = "Amnesia Mod Manager v1.3.0\nCopyright 2024 - github.com/jkulawik/ a.k.a. Darkfire"
 	helpDeleteInfo = "Saves tied to mods currently do not get deleted.\n" +
 		"Custom stories can be deleted entirely.\n" +
 		"Full conversions can leave leftovers because many of them\n" +
