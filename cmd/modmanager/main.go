@@ -129,10 +129,15 @@ func makeModTypeTabs() fyne.CanvasObject {
 // ----------------------- General ----------------------- //
 
 func displayIfError(err error, w fyne.Window) {
-	if err != nil {
-		logger.Error.Println(err)
-		dialog.ShowError(err, w)
+	if err == nil {
+		return
 	}
+	logger.Error.Println(err)
+	if strings.Contains(err.Error(), "did not find any valid full conversions") ||
+		strings.Contains(err.Error(), "workshop/content/57300 no such file or directory") {
+		return
+	}
+	dialog.ShowError(err, w)
 }
 
 func showSettings(a fyne.App) {
