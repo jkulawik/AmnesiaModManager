@@ -33,9 +33,8 @@ const (
 	deleteWorkshopItemInfo = "deleting Steam Workshop mods directly is disabled because Steam\n" +
 		"will redownload the mod automatically.\n" +
 		"Please unsubscribe from the Workshop items instead"
-	isTestDataBuild = true
-	csPath          = "custom_stories"
-	workshopPath    = "../../workshop/content/57300"
+	csPath       = "custom_stories"
+	workshopPath = "../../workshop/content/57300"
 )
 
 var (
