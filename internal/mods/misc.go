@@ -2,6 +2,7 @@ package mods
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"modmanager/internal/logger"
@@ -55,10 +56,9 @@ func IsModNil(mod Mod) bool {
 func DeleteModDir(path string) error {
 	logger.Info.Println("trying to delete:", path)
 
-	// Check if img file exists
+	// Check if file exists
 	if _, err := os.Stat(path); err != nil {
-		logger.Error.Println(err)
-		return err
+		return fmt.Errorf("DeleteModDir: %w", err)
 	}
 
 	// There should be no trailing slashes anywhere and we need to add one for the deletion to succeed
@@ -68,5 +68,5 @@ func DeleteModDir(path string) error {
 	}
 
 	err := os.RemoveAll(path)
-	return err
+	return fmt.Errorf("DeleteModDir: %w", err)
 }
