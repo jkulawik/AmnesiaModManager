@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -27,7 +28,7 @@ const (
 	appInfo        = "Amnesia Mod Manager v1.3.0\nCopyright 2023 - github.com/jkulawik/ a.k.a. Darkfire"
 	helpDeleteInfo = "Saves tied to mods currently do not get deleted.\n" +
 		"Custom stories can be deleted entirely.\n" +
-		"Full conversions might leave leftovers because many of them\n" +
+		"Full conversions can leave leftovers because many of them\n" +
 		"do not properly list all of their folders and files in their config."
 	deleteWorkshopItemInfo = "deleting Steam Workshop mods directly is disabled because Steam\n" +
 		"will redownload the mod automatically.\n" +
@@ -64,6 +65,7 @@ func main() {
 	mainWindow = a.NewWindow(mainTitle)
 
 	var err error
+	start_time := time.Now()
 	customStories, err = mods.GetCustomStories(csPath)
 	displayIfError(err, mainWindow)
 	workshopStories, err := mods.GetCustomStories(workshopPath)
@@ -71,6 +73,7 @@ func main() {
 	displayIfError(err, mainWindow)
 	fullConversions, err = mods.GetFullConversions(".")
 	displayIfError(err, mainWindow)
+	logger.Info.Println("Mods loaded in ", time.Since(start_time))
 	err = mods.CheckIsRootDir(".")
 	displayIfError(err, mainWindow)
 

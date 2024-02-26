@@ -85,7 +85,7 @@ func GetFullConversions(workdir string) ([]*FullConversion, error) {
 	for _, init := range initList {
 		fc, err := GetConversionFromInit(workdir, workdir+"/"+init)
 		if err != nil {
-			logger.Error.Println("Error while reading full conversion from", init, ":", err)
+			logger.Error.Println("GetFullConversions:", err)
 			continue
 		}
 		fcList = append(fcList, fc)

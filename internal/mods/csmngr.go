@@ -49,7 +49,7 @@ func GetStoryFromDir(dir string) (*CustomStory, error) {
 	if _, err := os.Stat(cs.Dir + "/" + cs.ImgFile); err != nil {
 		base_name := filepath.Base(cs.ImgFile)
 		cs.ImgFile = ""
-		logger.Warn.Printf("GetStoryFromDir: searching for %s manually because an error occured: %v\n", base_name, err)
+		logger.Info.Printf("GetStoryFromDir: searching for %s manually because an error occured: %v\n", base_name, err)
 		walkFunc := func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				logger.Warn.Println("GetStoryFromDir: fs.WalkDir walkFunc:", err)
